@@ -14,6 +14,16 @@ public class LFSFile
 
 	public int lfsFlags;
 	
+	/**
+	 * May possibly separate into different segments using
+	 * 
+	 * public int segmentSize; (2/4/8/16/32/64)
+	 * 
+	 * and link all memory locations to file location. This will enable quick
+	 * caching for 32-bit/64-bit operations.
+	 * 
+	 * The segments would be combined with many different files' segments.
+	 */
 	public byte[] fileData;
 	
 	private LFSFile() {}

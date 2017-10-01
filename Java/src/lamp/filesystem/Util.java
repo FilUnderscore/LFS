@@ -2,7 +2,6 @@ package lamp.filesystem;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -71,8 +70,6 @@ public class Util
 		bais.skip(skip);
 	}
 	
-	public static StringBuilder DUMP_SB = new StringBuilder();
-	
 	public static int DUMP_CURRENTINDEX = 0;
 	public static int DUMP_NEWLINE = 6;
 	
@@ -80,7 +77,9 @@ public class Util
 	{
 		List<String> ignoreList = Arrays.asList(ignore);
 		
-		DUMP_SB.append("{");
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("{");
 		
 		for(int fieldIndex = 0; fieldIndex < clazz.getDeclaredFields().length; fieldIndex++)
 		{
@@ -96,8 +95,7 @@ public class Util
 			
 			if(DUMP_CURRENTINDEX % DUMP_NEWLINE == 0)
 			{
-				System.out.println(DUMP_SB.toString());
-				DUMP_SB = new StringBuilder();
+				builder.append("\r\n");
 			}
 			
 			if(fieldValue instanceof byte[])
@@ -105,19 +103,19 @@ public class Util
 				fieldValue = DatatypeConverter.printHexBinary((byte[])fieldValue);
 			}
 			
-			//DUMP_SB.append("\"" + fieldName + "\"" + " = " + "\"" + fieldValue + "\"");
+			builder.append("\"" + fieldName + "\"" + " = " + "\"" + fieldValue + "\"");
 			
 			if(fieldIndex < (clazz.getDeclaredFields().length - 1))
 			{
-				DUMP_SB.append(", ");
+				builder.append(", ");
 			}
 		}
 		
-		DUMP_SB.append("}");
+		builder.append("}");
 		
 		DUMP_CURRENTINDEX = 0;
 		
-		return DUMP_SB.toString();
+		return builder.toString();
 	}
 	
 	public static class CPU
