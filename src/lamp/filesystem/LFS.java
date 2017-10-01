@@ -1,63 +1,130 @@
 package lamp.filesystem;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import lamp.filesystem.file.LFSDrive;
+import lamp.filesystem.file.io.FileByteArrayOutputStream;
 
 public class LFS 
 {
-	public String VOLUME_NAME;
+	private static List<LFSDrive> DRIVES = new ArrayList<>();
 	
-	public String VOLUME_TYPE;
+	private static ByteArrayInputStream BAIS;
 	
-	public int VOLUME_SECTOR_SIZE;
-	
-	public int VOLUME_SECTORS_PER_TRACK;
-	
-	public int VOLUME_CYLINDERS;
-	
-	public int VOLUME_HEADS;
-	
-	public long VOLUME_MAXCAPACITY;
-
-	public int VOLUME_FILETABLE;
-	
-	public int VOLUME_PARTITIONS;
-	
-	public int VOLUME_VERSION;
-	
-	public static LFS read(ByteArrayInputStream bais)
+	public static void close() throws Exception
 	{
-		LFS lfs = new LFS();
+		DRIVES.clear();
 		
-		lfs.VOLUME_NAME = Util.readString(bais);
-		
-		lfs.VOLUME_TYPE = Util.readString(bais);
-		
-		lfs.VOLUME_SECTOR_SIZE = Util.readInt(bais);
-		
-		lfs.VOLUME_SECTORS_PER_TRACK = Util.readInt(bais);
-		
-		lfs.VOLUME_CYLINDERS = Util.readInt(bais);
-		
-		lfs.VOLUME_HEADS = Util.readInt(bais);
-		
-		//lfs.VOLUME_MAXCAPACITY = Integer.toUnsignedLong(Util.readInt(bais));
-		
-		lfs.VOLUME_MAXCAPACITY = Integer.toUnsignedLong(lfs.VOLUME_SECTOR_SIZE * lfs.VOLUME_SECTORS_PER_TRACK * lfs.VOLUME_CYLINDERS * lfs.VOLUME_HEADS);
-		
-		lfs.VOLUME_FILETABLE = Util.readInt(bais);
-		
-		lfs.VOLUME_PARTITIONS = Util.readInt(bais);
-		
-		lfs.VOLUME_VERSION = Util.readInt(bais);
-		
-		return lfs;
+		if(BAIS != null)
+			BAIS.close();
 	}
 	
-	public String toString()
+	public static void read(ByteArrayInputStream bais)
+	{
+		DRIVES.add(LFSDrive.readDrive(bais));
+		
+		BAIS = bais;
+	}
+	
+	public static byte[] write() throws IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		for(LFSDrive drive : DRIVES)
+		{
+			drive.writeDrive(baos);
+		}
+		
+		return baos.toByteArray();
+	}
+	
+	public static LFSDrive addDrive(LFSDrive drive)
+	{
+		if(!DRIVES.contains(drive))
+		{
+			DRIVES.add(drive);
+		}
+		
+		return drive;
+	}
+	
+	public static Map<LFSDrive, byte[]> save(byte[] dat) throws IOException
+	{
+		Map<LFSDrive, byte[]> map = new HashMap<>();
+		
+		for(LFSDrive drive : DRIVES)
+		{
+			FileByteArrayOutputStream baos = new FileByteArrayOutputStream();
+			
+			byte[] data = write();
+			
+			baos.write(dat, 0, dat.length);
+			
+			byte[] wD = writeDrive(drive);
+			
+			baos.write(wD, 0, 0, wD.length);
+			baos.write(data, 0, drive.VOLUME_FILETABLE, data.length);
+
+			map.put(drive, baos.toByteArray());
+			
+			baos.close();
+		}
+		
+		return map;
+	}
+	
+	public static byte[] writeDrive(LFSDrive drive) throws IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		Util.writeByteArray(baos, drive.VOLUME_NAME.getBytes(), true);
+		
+		Util.writeByteArray(baos, drive.VOLUME_TYPE.getBytes(), true);
+		
+		Util.writeInt(baos, drive.VOLUME_SECTOR_SIZE);
+		
+		Util.writeInt(baos, drive.VOLUME_SECTORS_PER_TRACK);
+		
+		Util.writeInt(baos, drive.VOLUME_CYLINDERS);
+		
+		Util.writeInt(baos, drive.VOLUME_HEADS);
+		
+		Util.writeInt(baos, drive.VOLUME_FILETABLE);
+		
+		Util.writeInt(baos, drive.VOLUME_PARTITIONS);
+		
+		Util.writeInt(baos, drive.VOLUME_VERSION);
+		
+		return baos.toByteArray();
+	}
+	
+	public static List<LFSDrive> getDrives()
+	{
+		return Collections.unmodifiableList(DRIVES);
+	}
+	
+	public static LFSDrive getDefaultDrive()
+	{
+		return DRIVES.get(0);
+	}
+	
+	public static String string()
 	{
 		try
 		{
-			return Util.dump(this.getClass(), this);
+			StringBuilder builder = new StringBuilder();
+			for(LFSDrive drive : getDrives())
+			{
+				builder.append(drive.toString());
+			}
+			return builder.toString();
 		}
 		catch(Exception e)
 		{
