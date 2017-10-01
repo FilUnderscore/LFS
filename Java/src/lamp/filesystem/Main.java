@@ -6,14 +6,16 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import lamp.filesystem.Util.CPU;
 import lamp.filesystem.file.LFSDirectory;
 import lamp.filesystem.file.LFSDrive;
 import lamp.filesystem.file.LFSFile;
 import lamp.filesystem.file.LFSFlag;
+import lamp.filesystem.file.io.FileByteArrayOutputStream;
 
 public class Main 
 {
-	public static String FILE_URI = "../Lamp/bin/bootloader/boot.iso";
+	public static String FILE_URI = "../../Lamp/bin/bootloader/boot.iso";
 	public static byte[] ORIGINAL_DATA;
 	
 	public static void main(String[] args) throws Exception
@@ -51,25 +53,39 @@ public class Main
 			data = newDataMap.get(drive);
 		}
 		
-		write(FILE_URI, data);
+		write(FILE_URI, data, (byte)0x34);
 	}
 	
 	public static void testRead()
 	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(ORIGINAL_DATA);
 		
+		//Skip JMP instruction
+		bais.skip(2);
+		
 		LFS.read(bais);
 	
 		System.out.println(LFS.string());
 	}
 	
-	public static void write(String file, byte[] data) throws Exception
+	public static void write(String file, byte[] data, byte labelStart) throws Exception
 	{
+		FileByteArrayOutputStream baos = new FileByteArrayOutputStream();
+		
+		//JMP instruction
+		byte[] jmpToLabel = new byte[] {CPU.JMP_SHORT, labelStart};
+		
+		baos.write(jmpToLabel, 0, jmpToLabel.length);
+		
+		baos.write(data, 2, jmpToLabel.length, data.length - 2);
+		
 		FileOutputStream fO = new FileOutputStream(file);
 		
-		fO.write(data, 0, data.length);
+		fO.write(baos.toByteArray());
 		
 		fO.flush();
 		fO.close();
+		
+		baos.close();
 	}
 }

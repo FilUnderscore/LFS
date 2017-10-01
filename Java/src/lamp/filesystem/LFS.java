@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.DatatypeConverter;
+
 import lamp.filesystem.file.LFSDrive;
 import lamp.filesystem.file.io.FileByteArrayOutputStream;
 
@@ -67,9 +69,18 @@ public class LFS
 			
 			baos.write(dat, 0, dat.length);
 			
+			//System.out.println("Dat: " + DatatypeConverter.printHexBinary(dat));
+			
 			byte[] wD = writeDrive(drive);
 			
+			System.out.println(DatatypeConverter.printHexBinary(wD));
+			
+			System.out.println(wD.length);
 			baos.write(wD, 0, 0, wD.length);
+			// 4 extra bytes prepended always????
+			
+			System.out.println(DatatypeConverter.printHexBinary(baos.toByteArray()));
+			
 			baos.write(data, 0, drive.VOLUME_FILETABLE, data.length);
 
 			map.put(drive, baos.toByteArray());
@@ -84,9 +95,9 @@ public class LFS
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		
-		Util.writeByteArray(baos, drive.VOLUME_NAME.getBytes(), true);
+		Util.writeString(baos, drive.VOLUME_NAME);
 		
-		Util.writeByteArray(baos, drive.VOLUME_TYPE.getBytes(), true);
+		Util.writeString(baos, drive.VOLUME_TYPE);
 		
 		Util.writeInt(baos, drive.VOLUME_SECTOR_SIZE);
 		

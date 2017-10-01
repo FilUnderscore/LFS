@@ -118,7 +118,6 @@ public class LFSDrive
 		Util.skip(this.BAIS, this.VOLUME_FILETABLE);
 		
 		int directoriesSize = Util.readInt(this.BAIS);
-		
 		/*
 		 * Scan through all directories.
 		 */

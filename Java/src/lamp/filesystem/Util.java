@@ -18,76 +18,60 @@ public class Util
 	public static int INT_SIZE = 4;
 	public static int LONG_SIZE = 8;
 	
-	public static String readString(ByteArrayInputStream bais)
-	{
-		int len = readInt(bais);
-		
-		return new String(readByteArray(bais, len));
-	}
-	
-	public static void writeString(ByteArrayOutputStream baos, String string) throws IOException
-	{
-		writeInt(baos, string.length());
-		
-		writeByteArray(baos, string.getBytes(), false);
-	}
-	
-	public static int readInt(ByteArrayInputStream bais)
-	{
-		byte[] arr = readByteArray(bais, INT_SIZE);
-		
-		return ByteBuffer.wrap(arr).order(ByteOrder.LITTLE_ENDIAN).getInt();
-	}
-	
-	public static void writeInt(ByteArrayOutputStream baos, int i) throws IOException
-	{
-		writeByteArray(baos, ByteBuffer.allocate(INT_SIZE).order(ByteOrder.LITTLE_ENDIAN).putInt(i).array(), false);
-	}
-	
-	public static long readLong(ByteArrayInputStream bais)
-	{
-		byte[] arr = readByteArray(bais);
-		
-		return ByteBuffer.wrap(arr).order(ByteOrder.LITTLE_ENDIAN).getLong();
-	}
-	
-	public static void writeLong(ByteArrayOutputStream baos, long l) throws IOException
-	{
-		writeByteArray(baos, ByteBuffer.allocate(LONG_SIZE).order(ByteOrder.LITTLE_ENDIAN).putLong(l).array(), false);
-	}
-	
 	public static byte[] readByteArray(ByteArrayInputStream bais)
 	{
-		int length = bais.read();
+		int length = readInt(bais);
 		
-		byte[] arr = new byte[length];
-		
-		bais.read(arr, 0, length);
-		
-		return arr;
+		return readByteArray(bais, length);
 	}
 	
 	public static byte[] readByteArray(ByteArrayInputStream bais, int length)
 	{
-		byte[] arr = new byte[length];
+		byte[] array = new byte[length];
 		
-		bais.read(arr, 0, length);
+		bais.read(array, 0, length);
 		
-		return arr;
+		return ByteBuffer.wrap(array).order(ByteOrder.BIG_ENDIAN).array();
 	}
 	
-	public static void writeByteArray(ByteArrayOutputStream baos, byte[] arr, boolean prefix) throws IOException
+	public static void writeByteArray(ByteArrayOutputStream baos, byte[] array, boolean prefixed)
 	{
-		if(prefix) 
-			baos.write(arr.length);
+		array = ByteBuffer.wrap(array).order(ByteOrder.BIG_ENDIAN).array();
 		
-		baos.write(arr);
+		if(prefixed)
+			writeInt(baos, array.length);
+		
+		baos.write(array, 0, array.length);
 	}
+	
+	public static int readInt(ByteArrayInputStream bais)
+	{
+		return ByteBuffer.wrap(readByteArray(bais, INT_SIZE)).order(ByteOrder.BIG_ENDIAN).getInt(0);
+	}
+	
+	public static void writeInt(ByteArrayOutputStream baos, int i)
+	{
+		writeByteArray(baos, ByteBuffer.allocate(INT_SIZE).order(ByteOrder.BIG_ENDIAN).putInt(0, i).array(), false);
+	}
+	
+	
+	public static String readString(ByteArrayInputStream bais)
+	{
+		return new String(readByteArray(bais));
+	}
+	
+	public static void writeString(ByteArrayOutputStream baos, String str)
+	{
+		writeByteArray(baos, str.getBytes(), true);
+	}
+	
 	
 	public static void skip(ByteArrayInputStream bais, long skip)
 	{
 		bais.skip(skip);
 	}
+	
+	public static StringBuilder DUMP_SB = new StringBuilder();
 	
 	public static int DUMP_CURRENTINDEX = 0;
 	public static int DUMP_NEWLINE = 6;
@@ -96,9 +80,7 @@ public class Util
 	{
 		List<String> ignoreList = Arrays.asList(ignore);
 		
-		StringBuilder builder = new StringBuilder();
-		
-		builder.append("{");
+		DUMP_SB.append("{");
 		
 		for(int fieldIndex = 0; fieldIndex < clazz.getDeclaredFields().length; fieldIndex++)
 		{
@@ -114,7 +96,8 @@ public class Util
 			
 			if(DUMP_CURRENTINDEX % DUMP_NEWLINE == 0)
 			{
-				builder.append("\r\n");
+				System.out.println(DUMP_SB.toString());
+				DUMP_SB = new StringBuilder();
 			}
 			
 			if(fieldValue instanceof byte[])
@@ -122,18 +105,23 @@ public class Util
 				fieldValue = DatatypeConverter.printHexBinary((byte[])fieldValue);
 			}
 			
-			builder.append("\"" + fieldName + "\"" + " = " + "\"" + fieldValue + "\"");
+			//DUMP_SB.append("\"" + fieldName + "\"" + " = " + "\"" + fieldValue + "\"");
 			
 			if(fieldIndex < (clazz.getDeclaredFields().length - 1))
 			{
-				builder.append(", ");
+				DUMP_SB.append(", ");
 			}
 		}
 		
-		builder.append("}");
+		DUMP_SB.append("}");
 		
 		DUMP_CURRENTINDEX = 0;
 		
-		return builder.toString();
+		return DUMP_SB.toString();
+	}
+	
+	public static class CPU
+	{
+		public static byte JMP_SHORT = (byte)0xEB;
 	}
 }
