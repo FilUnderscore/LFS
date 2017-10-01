@@ -9,7 +9,7 @@ public class Main
 {
 	public static void main(String[] args) throws IOException
 	{
-		LFS lfs = LFS.read(new ByteArrayInputStream(Files.readAllBytes(Paths.get("/Users/filipjerkovic/Desktop/Lamp/bin/bootloader/boot.iso"))));
+		LFS lfs = LFS.read(new ByteArrayInputStream(Files.readAllBytes(Paths.get("../Lamp/bin/bootloader/boot.iso"))));
 	
 		System.out.println(lfs.toString());
 	}
