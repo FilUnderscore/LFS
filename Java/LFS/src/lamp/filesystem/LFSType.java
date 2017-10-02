@@ -323,6 +323,14 @@ public abstract class LFSType
 		out.writeLong(this.parentAddress);
 	}
 	
+	public void readParent(LFSTypeInputStream in)
+	{
+		if(!in.readBoolean())
+			return;
+		
+		this.parentAddress = in.readLong();
+	}
+	
 	/**
 	 * 
 	 * @param out
@@ -503,6 +511,8 @@ public abstract class LFSType
 	 */
 	public void load(LFSTypeInputStream in)
 	{
+		this.readParent(in);
+		
 		this.name = in.readString();
 		
 		this.typeData = new LFSTypeData();
@@ -519,6 +529,8 @@ public abstract class LFSType
 	public void save(LFSTypeOutputStream out)
 	{
 		this.savedMemoryAddress = out.getCurrentPosition();
+		
+		this.writeParent(out);
 		
 		out.writeString(this.name);
 		
