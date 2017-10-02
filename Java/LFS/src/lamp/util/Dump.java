@@ -1,5 +1,6 @@
 package lamp.util;
 
-public class Dump {
+public final class Dump 
+{
 
 }

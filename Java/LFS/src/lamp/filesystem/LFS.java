@@ -1,5 +1,6 @@
 package lamp.filesystem;
 
-public class LFS {
+public final class LFS 
+{
 
 }

@@ -16,8 +16,6 @@ public class LFSDirectory extends LFSType
 		//TODO: Write Parent Address
 		
 		super.save(out);
-		
-		this.writeChildren(out);
 	}
 	
 	public void load(LFSTypeInputStream in)

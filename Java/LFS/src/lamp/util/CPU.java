@@ -1,5 +1,6 @@
 package lamp.util;
 
-public class CPU {
-
+public final class CPU 
+{
+	public static final byte JMP_SHORT = (byte)0xEB;
 }

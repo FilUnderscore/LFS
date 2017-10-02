@@ -3,7 +3,7 @@ package lamp.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ByteUtil 
+public final class ByteUtil 
 {
 	public static byte[] merge(List<byte[]> input, int finalSize)
 	{
