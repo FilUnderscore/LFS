@@ -73,15 +73,17 @@ public class Main
 		FileByteArrayOutputStream baos = new FileByteArrayOutputStream();
 		
 		//JMP instruction
-		byte[] jmpToLabel = new byte[] {CPU.JMP_SHORT, labelStart};
+		//byte[] jmpToLabel = new byte[] {CPU.JMP_SHORT, labelStart};
 		
-		baos.write(jmpToLabel, 0, jmpToLabel.length);
+		//baos.write(jmpToLabel, 0, jmpToLabel.length);
 		
-		baos.write(data, 2, jmpToLabel.length, data.length - 2);
+		//baos.write(data, 2, 2, data.length - 2);
 		
 		FileOutputStream fO = new FileOutputStream(file);
 		
-		fO.write(baos.toByteArray());
+		//fO.write(baos.toByteArray());
+		
+		fO.write(data);
 		
 		fO.flush();
 		fO.close();

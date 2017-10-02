@@ -126,7 +126,7 @@ public class LFSDirectory
 	{
 		try
 		{
-			return Util.dump(this.getClass(), this, "parentDrive");
+			return Util.dump(this.getClass(), this, "parentDrive", "parentDirectory");
 		}
 		catch(Exception e)
 		{

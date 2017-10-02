@@ -21,6 +21,8 @@ public class Util
 	{
 		int length = readInt(bais);
 		
+		System.out.println("Len:" + length);
+		
 		return readByteArray(bais, length);
 	}
 	
