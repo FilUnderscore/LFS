@@ -52,11 +52,11 @@ public abstract class LFSType
 	protected String name;
 	
 	/**
-	 * Type Data for this type.
+	 * Metadata for this type.
 	 * 
-	 * See {@link LFSTypeData}.
+	 * See {@link LFSTypeMetadata}.
 	 */
-	protected LFSTypeData typeData;
+	protected LFSTypeMetadata typeMetadata;
 	
 	/**
 	 * Parent of this type.
@@ -116,12 +116,12 @@ public abstract class LFSType
 	 * 
 	 * 
 	 * @param name
-	 * @param typeData
+	 * @param typeMetadata
 	 */
-	public LFSType(String name, LFSTypeData typeData)
+	public LFSType(String name, LFSTypeMetadata typeMetadata)
 	{
 		this.name = name;
-		this.typeData = typeData;
+		this.typeMetadata = typeMetadata;
 	}
 	
 	/**
@@ -129,11 +129,11 @@ public abstract class LFSType
 	 * 
 	 * @param parentAddress
 	 * @param name
-	 * @param flags
+	 * @param typeMetadata
 	 */
-	protected LFSType(long parentAddress, String name, LFSTypeData typeData)
+	protected LFSType(long parentAddress, String name, LFSTypeMetadata typeMetadata)
 	{
-		this(name, typeData);
+		this(name, typeMetadata);
 		
 		this.parentAddress = parentAddress;
 	}
@@ -141,12 +141,12 @@ public abstract class LFSType
 	/**
 	 * 
 	 * @param name
-	 * @param flags
+	 * @param typeMetadata
 	 * @param childrenAddresses
 	 */
-	protected LFSType(String name, LFSTypeData typeData, long...childrenAddresses)
+	protected LFSType(String name, LFSTypeMetadata typeMetadata, long...childrenAddresses)
 	{
-		this(name, typeData);
+		this(name, typeMetadata);
 		
 		this.childrenAddresses = childrenAddresses;
 	}
@@ -155,12 +155,12 @@ public abstract class LFSType
 	 * 
 	 * @param parentAddress
 	 * @param name
-	 * @param flags
+	 * @param typeMetadata
 	 * @param childrenAddresses
 	 */
-	protected LFSType(long parentAddress, String name, LFSTypeData typeData, long...childrenAddresses)
+	protected LFSType(long parentAddress, String name, LFSTypeMetadata typeMetadata, long...childrenAddresses)
 	{
-		this(name, typeData);
+		this(name, typeMetadata);
 		
 		this.parentAddress = parentAddress;
 		this.childrenAddresses = childrenAddresses;
@@ -433,9 +433,9 @@ public abstract class LFSType
 	 * 
 	 * @return
 	 */
-	public LFSTypeData getTypeData()
+	public LFSTypeMetadata getMetadata()
 	{
-		return this.typeData;
+		return this.typeMetadata;
 	}
 	
 	/**
@@ -515,8 +515,8 @@ public abstract class LFSType
 		
 		this.name = in.readString();
 		
-		this.typeData = new LFSTypeData();
-		this.typeData.read(in);
+		this.typeMetadata = new LFSTypeMetadata();
+		this.typeMetadata.read(in);
 		
 		this.loadChildren(in);
 	}
@@ -534,7 +534,7 @@ public abstract class LFSType
 		
 		out.writeString(this.name);
 		
-		this.typeData.write(out);
+		this.typeMetadata.write(out);
 		
 		this.writeChildren(out);
 	}
@@ -567,11 +567,11 @@ public abstract class LFSType
 	}
 	
 	/**
-	 * {@link LFSType} Information
+	 * {@link LFSType} Metadata
 	 *
 	 * @author Filip Jerkovic
 	 */
-	public static class LFSTypeData
+	public static class LFSTypeMetadata
 	{
 		/*
 		 * VARIABLES

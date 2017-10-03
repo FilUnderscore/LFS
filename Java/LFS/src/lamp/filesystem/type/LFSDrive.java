@@ -6,9 +6,9 @@ import lamp.filesystem.io.LFSTypeOutputStream;
 
 public class LFSDrive extends LFSType
 {
-	public LFSDrive(String name, LFSTypeData typeData) 
+	public LFSDrive(String name, LFSTypeMetadata typeMetadata) 
 	{
-		super(name, typeData);
+		super(name, typeMetadata);
 	}
 	
 	public void load(LFSTypeInputStream in)
