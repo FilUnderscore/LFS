@@ -13,8 +13,6 @@ public class LFSDirectory extends LFSType
 	
 	public void save(LFSTypeOutputStream out)
 	{
-		//TODO: Write Parent Address
-		
 		super.save(out);
 	}
 	
