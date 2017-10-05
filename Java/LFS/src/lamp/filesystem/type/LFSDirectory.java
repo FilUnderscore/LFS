@@ -1,6 +1,7 @@
 package lamp.filesystem.type;
 
 import lamp.filesystem.LFSType;
+import lamp.filesystem.LFSTypeMetadata;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 

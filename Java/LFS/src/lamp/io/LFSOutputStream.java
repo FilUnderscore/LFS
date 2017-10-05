@@ -44,10 +44,20 @@ public class LFSOutputStream
 	{
 		this.position = position;
 		
+		grow(offset, length);
+		
 		for(int index = offset; index < length; index++)
 		{
 			this.buffer.add(this.position + index, data[index]);
 			this.position++;
+		}
+	}
+	
+	private void grow(int offset, int length)
+	{
+		for(int index = offset; index < length; index++)
+		{
+			this.buffer.add((byte)0x00);
 		}
 	}
 	
@@ -69,7 +79,10 @@ public class LFSOutputStream
 		
 		while(count < POSITION_FREE_COUNT)
 		{
-			currentPos++;
+			if(currentPos > this.buffer.size())
+			{
+				grow(0, currentPos);
+			}
 			
 			if(this.buffer.get(currentPos) != null || this.buffer.get(currentPos) != 0)
 			{
@@ -79,6 +92,8 @@ public class LFSOutputStream
 			{
 				count++;
 			}
+			
+			currentPos++;
 		}
 		
 		this.position = currentPos;

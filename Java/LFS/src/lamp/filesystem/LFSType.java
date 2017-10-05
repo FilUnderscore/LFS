@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lamp.filesystem.integrity.LFSChecksum;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDirectory;
@@ -103,6 +104,8 @@ public abstract class LFSType
 	 */
 	protected byte[] segmentedData;
 	
+	protected LFSChecksum checksum;
+	
 	/*
 	 * CONSTRUCTORS 
 	 */
@@ -110,7 +113,7 @@ public abstract class LFSType
 	/**
 	 * An empty constructor for use with {@link LFSType.load(Class<?>, byte[])}
 	 */
-	private LFSType() {}
+	LFSType() {}
 	
 	/**
 	 * 
@@ -347,8 +350,11 @@ public abstract class LFSType
 			out.writeBoolean(true);
 		}
 		
+		this.childrenAddresses = new long[this.children.length];
+		
 		for(int childIndex = 0; childIndex < this.children.length; childIndex++)
 		{
+			this.children[childIndex].save(out);
 			this.childrenAddresses[childIndex] = this.children[childIndex].savedMemoryAddress;
 		}
 		
@@ -416,6 +422,24 @@ public abstract class LFSType
 		}
 	}
 	
+	public void addChild(LFSType... child)
+	{
+		if(this.children == null || this.children.length < 0)
+			this.children = new LFSType[0];
+		
+		//Create new array.
+		LFSType[] children = new LFSType[this.children.length + child.length];
+		
+		//Clone existing array data.
+		System.arraycopy(this.children, 0, children, 0, this.children.length);
+		
+		//Copy added children to array.
+		System.arraycopy(child, 0, children, (children.length - 1), child.length);
+		
+		//Set children array to current + added.
+		this.children = children;
+	}
+	
 	/*
 	 * RETURN METHODS
 	 */
@@ -464,6 +488,33 @@ public abstract class LFSType
 	public long getSavedMemoryAddress()
 	{
 		return this.savedMemoryAddress;
+	}
+	
+	public String getFullPath()
+	{
+		String path = this.getPath();
+		
+		//Append file name
+		path += this.name;
+		
+		return path;
+	}
+	
+	public String getPath()
+	{
+		String path = "";
+		
+		LFSType parent = this.parent;
+		
+		while(parent != null)
+		{
+			//Append parent file name (most likely a directory).
+			path += parent.name + "/";
+			
+			parent = parent.parent;
+		}
+		
+		return path;
 	}
 	
 	/*
@@ -537,93 +588,5 @@ public abstract class LFSType
 		this.typeMetadata.write(out);
 		
 		this.writeChildren(out);
-	}
-	
-	/*
-	 * CLASSES
-	 */
-	
-	/**
-	 * Flags for {@link LFSType} storage.
-	 * 
-	 * @author Filip Jerkovic
-	 */
-	public static class LFSFlag
-	{
-		/**
-		 * Read Flag
-		 */
-		public static int READ = 1;
-		
-		/**
-		 * Write Flag
-		 */
-		public static int WRITE = 2;
-		
-		/**
-		 * Execute Flag
-		 */
-		public static int EXECUTE = 3;
-	}
-	
-	/**
-	 * {@link LFSType} Metadata
-	 *
-	 * @author Filip Jerkovic
-	 */
-	public static class LFSTypeMetadata
-	{
-		/*
-		 * VARIABLES
-		 */
-		
-		/**
-		 * Flags set for the {@link LFSType}.
-		 * 
-		 * {@link LFSType}
-		 */
-		public int flags;
-		
-		/**
-		 * Timestamp for {@link LFSType}'s creation.
-		 */
-		public long created;
-		
-		/**
-		 * Timestamp for {@link LFSType}'s last modified.
-		 */
-		public long lastModified;
-		
-		/*
-		 * METHODS
-		 */
-		
-		/**
-		 * Write to {@link LFSTypeOutputStream}.
-		 * 
-		 * @param out The output stream - {@link LFSTypeOutputStream}.
-		 */
-		public void write(LFSTypeOutputStream out)
-		{
-			out.writeInt(this.flags);
-			
-			out.writeLong(this.created);
-			
-			out.writeLong(this.lastModified);
-		}
-		
-		/**
-		 * Restore/load data from {@link LFSTypeInputStream}.
-		 * 
-		 * @param in The input stream - {@link LFSTypeInputStream}.
-		 */
-		public void read(LFSTypeInputStream in)
-		{
-			this.flags = in.readInt();
-			
-			this.created = in.readLong();
-			
-			this.lastModified = in.readLong();
-		}
 	}
 }
