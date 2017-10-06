@@ -233,17 +233,21 @@ public abstract class LFSType
 	{
 		List<byte[]> segments = this.separateSegments();
 		
-		int position = out.getCurrentPosition();
+		int position = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
+		int finishPosition = 0;
 		
 		//Write segments length/size
 		out.writeInt(segments.size());
 		for(byte[] segment : segments)
 		{
-			//Skip one sector, to be away from conflicts with segment memory addresses
-			out.toPosition(position + 512);
-		
-			//Find empty address
-			out.ifCurrentPositionAvailableThenSet();
+			//Skip to empty space - away from segment address table, to be away from conflicts with segment memory addresses
+			int addressSpace = LFSTypeOutputStream.LONG_SIZE * segments.size();
+			out.toPosition(position + addressSpace);
+			
+			finishPosition = (position + addressSpace);
+			
+			//Find empty address with enough space.
+			out.ifCurrentPositionAvailableThenSet(segment.length);
 			long emptySegmentAddress = (long)out.getCurrentPosition();
 			
 			//Write segment to empty address
@@ -258,6 +262,8 @@ public abstract class LFSType
 			//Update position
 			position = out.getCurrentPosition();
 		}
+		
+		out.toPosition(finishPosition);
 	}
 	
 	/**

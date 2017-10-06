@@ -1,16 +1,12 @@
 package lamp.io;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import lamp.util.ByteUtil;
 
 public class LFSOutputStream
 {
-	public static final int POSITION_FREE_COUNT = 16;
-	
 	protected List<Byte> buffer;
 	
 	protected int position;
@@ -27,17 +23,6 @@ public class LFSOutputStream
 		this.buffer = new ArrayList<Byte>(startingSize);
 	}
 	
-	/*
-	public void grow(int newLength)
-	{
-		if((this.position + newLength) > this.length)
-		{
-			this.buffer = Arrays.copyOf(buffer, newLength);
-			this.length = newLength;
-		}
-	}
-	*/
-	
 	public void write(byte[] data, int offset, int length)
 	{
 		this.write(this.position, data, offset, length);
@@ -52,11 +37,10 @@ public class LFSOutputStream
 		{
 			grow(newLength);
 		}
-			
+		
 		for(int index = 0; index < length; index++)
 		{
-			this.buffer.add(this.position, data[index + offset]);
-			this.position++;
+			this.buffer.set(this.position++, data[index + offset]);
 		}
 	}
 	
@@ -79,29 +63,26 @@ public class LFSOutputStream
 		return ByteUtil.listToPrimitive(this.buffer);
 	}
 	
-	public void ifCurrentPositionAvailableThenSet()
+	public void ifCurrentPositionAvailableThenSet(int size)
 	{
-		int currentPos = this.position;
-		System.out.println("pos: " + currentPos);
+		int pos = this.position - 1;
 		
-		int count = 0;
+		int empty = 0;
 		
-		while(count < POSITION_FREE_COUNT)
+		while(empty < size)
 		{
-			if(this.buffer.get(currentPos) != 0)
+			//Go to next position, if this position is not empty.
+			if(buffer.get(pos) != 0)
 			{
-				System.out.println("cont");
-				continue;
+				toPosition(pos++);
+				
+				//Reset empty counter, because address has data within, 
+				//and not enough space to squeeze in.
+				empty = 0;
 			}
 			else
-			{
-				count++;
-			}
-			
-			currentPos++;
+				empty++;
 		}
-		
-		this.position = currentPos;
 	}
 	
 	public void toPosition(int position)
