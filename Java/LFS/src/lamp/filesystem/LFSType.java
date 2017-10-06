@@ -580,7 +580,7 @@ public abstract class LFSType
 	public void save(LFSTypeOutputStream out)
 	{
 		this.savedMemoryAddress = out.getCurrentPosition();
-		
+	
 		this.writeParent(out);
 		
 		out.writeString(this.name);

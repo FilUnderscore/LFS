@@ -84,7 +84,7 @@ public class LFSOutputStream
 				grow(0, currentPos);
 			}
 			
-			if(this.buffer.get(currentPos) != null || this.buffer.get(currentPos) != 0)
+			if(this.buffer.get(currentPos) != null && this.buffer.get(currentPos) != 0)
 			{
 				continue;
 			}
