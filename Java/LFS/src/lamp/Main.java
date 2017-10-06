@@ -1,5 +1,10 @@
 package lamp;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 import javax.xml.bind.DatatypeConverter;
 
 import lamp.filesystem.LFS;
@@ -34,5 +39,11 @@ public class Main
 		byte[] data = lfs.saveDrive(lfsDrive.getDriveId());
 		
 		System.out.println("Data: " + DatatypeConverter.printHexBinary(data));
+		
+		try {
+			Files.write(Paths.get("test.bin"), data, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

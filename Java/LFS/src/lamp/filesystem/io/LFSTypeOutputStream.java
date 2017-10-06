@@ -4,6 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
+import javax.xml.bind.DatatypeConverter;
+
 import lamp.io.LFSOutputStream;
 
 public class LFSTypeOutputStream extends LFSOutputStream

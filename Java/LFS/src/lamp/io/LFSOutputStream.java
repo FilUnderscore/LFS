@@ -1,18 +1,20 @@
 package lamp.io;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lamp.util.ByteUtil;
 
-public class LFSOutputStream 
+public class LFSOutputStream
 {
 	public static final int POSITION_FREE_COUNT = 16;
 	
 	protected List<Byte> buffer;
 	
 	protected int position;
-	//protected int length;
+	protected int length;
 	
 	public LFSOutputStream()
 	{
@@ -21,6 +23,7 @@ public class LFSOutputStream
 	
 	public LFSOutputStream(int startingSize)
 	{
+		this.length = startingSize;
 		this.buffer = new ArrayList<Byte>(startingSize);
 	}
 	
@@ -44,23 +47,28 @@ public class LFSOutputStream
 	{
 		this.position = position;
 		
-		grow(offset, length);
-		
-		for(int index = offset; index < length; index++)
+		int newLength = length + position;
+		if(newLength > this.length)
 		{
-			this.buffer.add(this.position + index, data[index]);
+			grow(newLength);
+		}
+			
+		for(int index = 0; index < length; index++)
+		{
+			this.buffer.add(this.position, data[index + offset]);
 			this.position++;
 		}
 	}
 	
-	private void grow(int offset, int length)
+	protected void grow(int newLength)
 	{
-		for(int index = offset; index < length; index++)
+		while(this.length < newLength)
 		{
 			this.buffer.add((byte)0x00);
+			this.length++;
 		}
 	}
-	
+
 	public int getCurrentPosition()
 	{
 		return this.position;
@@ -74,18 +82,15 @@ public class LFSOutputStream
 	public void ifCurrentPositionAvailableThenSet()
 	{
 		int currentPos = this.position;
+		System.out.println("pos: " + currentPos);
 		
 		int count = 0;
 		
 		while(count < POSITION_FREE_COUNT)
 		{
-			if(currentPos > this.buffer.size())
+			if(this.buffer.get(currentPos) != 0)
 			{
-				grow(0, currentPos);
-			}
-			
-			if(this.buffer.get(currentPos) != null && this.buffer.get(currentPos) != 0)
-			{
+				System.out.println("cont");
 				continue;
 			}
 			else
@@ -101,6 +106,12 @@ public class LFSOutputStream
 	
 	public void toPosition(int position)
 	{
+		//Grow if needed.
+		if(position > this.length)
+		{
+			grow(position);
+		}
+		
 		this.position = position;
 	}
 }

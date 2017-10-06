@@ -69,7 +69,7 @@ public final class ByteUtil
 		{
 			if(primitiveList.get(primListIndex) != null)
 			{
-				array[primListIndex] = (byte)primitiveList.get(primListIndex);
+				array[primListIndex] = primitiveList.get(primListIndex);
 			}
 		}
 		
