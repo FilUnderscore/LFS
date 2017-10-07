@@ -11,6 +11,7 @@ import lamp.filesystem.LFS;
 import lamp.filesystem.LFSTypeMetadata;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
+import lamp.util.Dump;
 
 /**
  * Lamp File System implementation using
@@ -38,7 +39,7 @@ public class Main
 		
 		byte[] data = lfs.saveDrive(lfsDrive.getDriveId());
 		
-		System.out.println("Data: " + DatatypeConverter.printHexBinary(data));
+		System.out.println("Data: " + Dump.printHex(data));
 		
 		try {
 			Files.write(Paths.get("test.bin"), data, StandardOpenOption.CREATE, StandardOpenOption.WRITE);

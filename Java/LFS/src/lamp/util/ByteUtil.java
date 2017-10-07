@@ -17,9 +17,7 @@ public final class ByteUtil
 			
 			for(int byteIndex = 0; byteIndex < byteArray.length; byteIndex++)
 			{
-				output[outputIndex] = byteArray[byteIndex];
-				
-				outputIndex++;
+				output[outputIndex++] = byteArray[byteIndex];
 			}
 		}
 		

@@ -2,10 +2,10 @@ package lamp.filesystem;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import lamp.filesystem.data.LFSSegment;
+import lamp.filesystem.data.SegmentList;
 import lamp.filesystem.integrity.LFSChecksum;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
@@ -95,9 +95,9 @@ public abstract class LFSType
 	protected int segmentSize;
 	
 	/**
-	 * Segment Addresses
+	 * Segments, each contains a portion of data.
 	 */
-	protected Map<Long, byte[]> segmentAddresses;
+	protected SegmentList<LFSSegment> segments;
 	
 	/**
 	 * An array with all the segments recombined from the Segment Addresses.
@@ -192,13 +192,13 @@ public abstract class LFSType
 		
 		List<byte[]> segments = new ArrayList<>();
 		
-		for(Long address : this.segmentAddresses.keySet())
+		for(LFSSegment segment : this.segments)
 		{
-			byte[] segment = this.segmentAddresses.get(address);
+			byte[] data = segment.getData();
 			
-			segments.add(segment);
+			segments.add(data);
 			
-			totalSize += segment.length;
+			totalSize += data.length;
 		}
 		
 		this.segmentedData = new byte[totalSize];
@@ -220,9 +220,16 @@ public abstract class LFSType
 	 * 
 	 * @return
 	 */
-	public List<byte[]> separateSegments()
+	public void separateSegments()
 	{
-		return ByteUtil.split(this.segmentedData, this.segmentSize);
+		List<byte[]> data = ByteUtil.split(this.segmentedData, this.segmentSize);
+	
+		this.segments = new SegmentList<>();
+		
+		for(byte[] dat : data)
+		{
+			this.segments.add(new LFSSegment(dat));
+		}
 	}
 	
 	/**
@@ -231,27 +238,25 @@ public abstract class LFSType
 	 */
 	public void writeSegments(LFSTypeOutputStream out)
 	{
-		List<byte[]> segments = this.separateSegments();
+		this.separateSegments();
 		
-		int position = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
-		int finishPosition = 0;
+		int addrPosition = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
+		int position = addrPosition;
 		
 		//Write segments length/size
 		out.writeInt(segments.size());
-		for(byte[] segment : segments)
+		for(LFSSegment segment : segments)
 		{
 			//Skip to empty space - away from segment address table, to be away from conflicts with segment memory addresses
 			int addressSpace = LFSTypeOutputStream.LONG_SIZE * segments.size();
-			out.toPosition(position + addressSpace);
-			
-			finishPosition = (position + addressSpace);
+			out.toPosition(addrPosition + addressSpace);
 			
 			//Find empty address with enough space.
-			out.ifCurrentPositionAvailableThenSet(segment.length);
+			out.ifCurrentPositionAvailableThenSet(segment.getSize());
 			long emptySegmentAddress = (long)out.getCurrentPosition();
 			
 			//Write segment to empty address
-			out.writeArray(segment);
+			out.writeArray(segment.getData());
 		
 			//Go back to address map
 			out.toPosition(position);
@@ -263,7 +268,7 @@ public abstract class LFSType
 			position = out.getCurrentPosition();
 		}
 		
-		out.toPosition(finishPosition);
+		out.toPosition(position + this.segments.getTotalSize());
 	}
 	
 	/**
@@ -272,7 +277,7 @@ public abstract class LFSType
 	 */
 	public void readSegments(LFSTypeInputStream in)
 	{
-		this.segmentAddresses = new HashMap<>();
+		this.segments = new SegmentList<>();
 		
 		List<byte[]> segments = new ArrayList<>();
 		int totalArraySize = 0;
@@ -301,13 +306,22 @@ public abstract class LFSType
 			//Add segment to list
 			segments.add(segmentsIndex, segment);
 			
-			this.segmentAddresses.put(segmentAddress, segment);
+			createSegment(segmentAddress, segment);
 			
 			//Go back to address map to next segment address index.
 			in.toPosition(currentAddress);
 		}
 		
 		this.segmentedData = ByteUtil.merge(segments, totalArraySize);
+	}
+	
+	private void createSegment(long segmentAddress, byte[] data)
+	{
+		LFSSegment segment = new LFSSegment(data);
+		
+		segment.setAddress(segmentAddress);
+		
+		this.segments.add(segment);
 	}
 	
 	/**
