@@ -1,6 +1,7 @@
 package lamp.filesystem;
 
 import java.lang.reflect.Constructor;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 import lamp.util.ByteUtil;
+import lamp.util.Dump;
 
 /**
  * Lamp File System Type.
@@ -242,22 +244,33 @@ public abstract class LFSType
 		
 		int addrPosition = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
 		int position = addrPosition;
+		int addressSpace = LFSTypeOutputStream.LONG_SIZE * segments.size();
+		int afterAddrPos = addrPosition + addressSpace;
+		
+		long closestSegment = 0x00;
 		
 		//Write segments length/size
 		out.writeInt(segments.size());
 		for(LFSSegment segment : segments)
 		{
 			//Skip to empty space - away from segment address table, to be away from conflicts with segment memory addresses
-			int addressSpace = LFSTypeOutputStream.LONG_SIZE * segments.size();
-			out.toPosition(addrPosition + addressSpace);
+			
+			out.toPosition(afterAddrPos);
 			
 			//Find empty address with enough space.
 			out.ifCurrentPositionAvailableThenSet(segment.getSize());
 			long emptySegmentAddress = (long)out.getCurrentPosition();
 			
 			//Write segment to empty address
-			out.writeArray(segment.getData());
+			out.writeArray(segment.getData(), false);
 		
+			
+			long endOfSegmentAddress = (long)out.getCurrentPosition();
+			
+			if(endOfSegmentAddress > closestSegment)
+				closestSegment = endOfSegmentAddress;
+			
+			
 			//Go back to address map
 			out.toPosition(position);
 			
@@ -268,7 +281,10 @@ public abstract class LFSType
 			position = out.getCurrentPosition();
 		}
 		
-		out.toPosition(position + this.segments.getTotalSize());
+		//WriteChildren() overrides segment data. Detect segment data and prevent override.
+		
+		//Temporary fix?
+		out.toPosition((int)closestSegment);
 	}
 	
 	/**

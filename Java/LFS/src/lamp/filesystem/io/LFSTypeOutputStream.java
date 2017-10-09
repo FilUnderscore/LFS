@@ -19,38 +19,63 @@ public class LFSTypeOutputStream extends LFSOutputStream
 	
 	public void writeBoolean(boolean b)
 	{
+		this.writeBoolean(b, true);
+	}
+	
+	public void writeBoolean(boolean b, boolean overwrite)
+	{
 		byte bool = (byte) (b ? 1 : 0);
 		
 		byte[] array = ByteBuffer.allocate(BOOLEAN_SIZE).order(ENDIANNESS).put(bool).array();
 		
-		this.write(array, 0, array.length);
+		this.write(array, 0, array.length, overwrite);
 	}
 	
 	public void writeInt(int i)
 	{
+		this.writeInt(i, true);
+	}
+	
+	public void writeInt(int i, boolean overwrite)
+	{
 		byte[] array = ByteBuffer.allocate(INT_SIZE).order(ENDIANNESS).putInt(i).array();
 		
-		this.write(array, 0, array.length);
+		this.write(array, 0, array.length, overwrite);
 	}
 	
 	public void writeLong(long l)
 	{
+		this.writeLong(l, true);
+	}
+	
+	public void writeLong(long l, boolean overwrite)
+	{
 		byte[] array = ByteBuffer.allocate(LONG_SIZE).order(ENDIANNESS).putLong(l).array();
 		
-		this.write(array, 0, array.length);
+		this.write(array, 0, array.length, overwrite);
 	}
 	
 	public void writeString(String str)
 	{
+		this.writeString(str, true);
+	}
+	
+	public void writeString(String str, boolean overwrite)
+	{
 		byte[] array = str.getBytes(StandardCharsets.UTF_8);
 		
-		this.writeInt(array.length);
-		this.write(array, 0, array.length);
+		this.writeInt(array.length, overwrite);
+		this.write(array, 0, array.length, overwrite);
 	}
 	
 	public void writeArray(byte[] array)
 	{
-		this.writeInt(array.length);
-		this.write(array, 0, array.length);
+		this.writeArray(array, true);
+	}
+	
+	public void writeArray(byte[] array, boolean overwrite)
+	{
+		this.writeInt(array.length, overwrite);
+		this.write(array, 0, array.length, overwrite);
 	}
 }

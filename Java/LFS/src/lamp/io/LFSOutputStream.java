@@ -25,10 +25,10 @@ public class LFSOutputStream
 	
 	public void write(byte[] data, int offset, int length)
 	{
-		this.write(this.position, data, offset, length);
+		this.write(data, offset, length, true);
 	}
 	
-	public void write(int position, byte[] data, int offset, int length)
+	public void write(int position, byte[] data, int offset, int length, boolean overwrite)
 	{
 		this.position = position;
 		
@@ -38,10 +38,39 @@ public class LFSOutputStream
 			grow(newLength);
 		}
 		
+		if(!overwrite)
+		{
+			boolean verified = false;
+			
+			int verifyPos = this.position;
+			int newPos = this.position;
+			int c = 0;
+			
+			while(c < length)
+			{
+				if(this.buffer.get(verifyPos++) == 0)
+				{
+					c++;
+				}
+				else
+				{
+					newPos++;
+					c = 0;
+				}
+			}
+			
+			this.position = newPos;
+		}
+		
 		for(int index = 0; index < length; index++)
 		{
 			this.buffer.set(this.position++, data[index + offset]);
 		}
+	}
+	
+	public void write(byte[] data, int offset, int length, boolean overwrite)
+	{
+		this.write(this.position, data, offset, length, overwrite);
 	}
 	
 	protected void grow(int newLength)
