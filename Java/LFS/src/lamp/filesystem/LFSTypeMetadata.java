@@ -19,17 +19,30 @@ public class LFSTypeMetadata
 	 * 
 	 * {@link LFSType}
 	 */
-	public int flags;
+	private int flags;
 	
 	/**
 	 * Timestamp for {@link LFSType}'s creation.
 	 */
-	public long created;
+	private long timestampCreated;
 	
 	/**
 	 * Timestamp for {@link LFSType}'s last modified.
 	 */
-	public long lastModified;
+	private long timestampLastModified;
+	
+	/**
+	 * CONSTRUCTORS
+	 */
+	
+	LFSTypeMetadata()
+	{
+		this.flags = LFSFlag.READ | LFSFlag.WRITE | LFSFlag.EXECUTE;
+		
+		this.timestampCreated = System.currentTimeMillis();
+		
+		this.timestampLastModified = System.currentTimeMillis();
+	}
 	
 	/*
 	 * METHODS
@@ -44,9 +57,9 @@ public class LFSTypeMetadata
 	{
 		out.writeInt(this.flags);
 		
-		out.writeLong(this.created);
+		out.writeLong(this.timestampCreated);
 		
-		out.writeLong(this.lastModified);
+		out.writeLong(this.timestampLastModified);
 	}
 	
 	/**
@@ -58,8 +71,8 @@ public class LFSTypeMetadata
 	{
 		this.flags = in.readInt();
 		
-		this.created = in.readLong();
+		this.timestampCreated = in.readLong();
 		
-		this.lastModified = in.readLong();
+		this.timestampLastModified = in.readLong();
 	}
 }

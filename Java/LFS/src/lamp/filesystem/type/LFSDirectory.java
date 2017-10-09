@@ -7,9 +7,9 @@ import lamp.filesystem.io.LFSTypeOutputStream;
 
 public class LFSDirectory extends LFSType
 {
-	public LFSDirectory(String name, LFSTypeMetadata typeMetadata) 
+	public LFSDirectory(String name) 
 	{
-		super(name, typeMetadata);
+		super(name);
 	}
 	
 	public void save(LFSTypeOutputStream out)

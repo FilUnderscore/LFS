@@ -7,14 +7,14 @@ import lamp.filesystem.io.LFSTypeOutputStream;
 
 public class LFSFile extends LFSType
 {
-	public LFSFile(String name, LFSTypeMetadata typeMetadata)
+	public LFSFile(String name)
 	{
-		super(name, typeMetadata);
+		super(name);
 	}
 	
-	public LFSFile(String name, LFSTypeMetadata typeMetadata, int segmentSize, byte[] fileData)
+	public LFSFile(String name, int segmentSize, byte[] fileData)
 	{
-		this(name, typeMetadata);
+		this(name);
 		
 		this.segmentSize = segmentSize;
 		this.segmentedData = fileData;

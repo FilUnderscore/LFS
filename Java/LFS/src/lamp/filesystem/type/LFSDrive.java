@@ -9,9 +9,9 @@ public class LFSDrive extends LFSType
 {
 	private String driveId;
 	
-	public LFSDrive(String driveId, String name, LFSTypeMetadata typeMetadata) 
+	public LFSDrive(String driveId, String name) 
 	{
-		super(name, typeMetadata);
+		super(name);
 		
 		this.driveId = driveId;
 	}

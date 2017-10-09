@@ -5,10 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-import javax.xml.bind.DatatypeConverter;
-
 import lamp.filesystem.LFS;
-import lamp.filesystem.LFSTypeMetadata;
+import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 import lamp.util.Dump;
@@ -25,16 +23,25 @@ public class Main
 	{
 		//TEST -- START
 		LFS lfs = new LFS();
-	
+		
+		//Write Test
 		test1(lfs);
+		
+		//Read Test
+		test2(lfs);
 	}
 	
 	public static void test1(LFS lfs)
 	{
-		LFSDrive lfsDrive = new LFSDrive("A:", "Drive", new LFSTypeMetadata());
+		LFSDrive lfsDrive = new LFSDrive("A:", "Drive");
 		
-		lfsDrive.addChild(new LFSFile("test", new LFSTypeMetadata(), 2, new byte[] { (byte)0xEB, (byte)0x00 }));
-	
+		LFSDirectory lfsDir = new LFSDirectory("testDir");
+		
+		lfsDrive.addChild(lfsDir);
+		
+		lfsDir.addChild(new LFSFile("test", 2, new byte[] { (byte)0xEB, (byte)0x00 }));
+		lfsDir.addChild(new LFSFile("file", 4, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 }));
+		
 		lfs.addDrive(lfsDrive);
 		
 		byte[] data = lfs.saveDrive(lfsDrive.getDriveId());
@@ -46,5 +53,10 @@ public class Main
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void test2(LFS lfs)
+	{
+		
 	}
 }
