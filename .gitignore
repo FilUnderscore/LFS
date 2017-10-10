@@ -1,2 +1,6 @@
 Java/bin/
-Java/LFS/bin/
+.classpath
+.project
+.cproject
+C++/.settings/
+C++/debug/
