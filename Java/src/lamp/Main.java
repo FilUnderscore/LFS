@@ -57,6 +57,6 @@ public class Main
 	
 	public static void test2(LFS lfs)
 	{
-		
+		lfs.loadDrive(lfs.saveDrive("A:"));
 	}
 }

@@ -1,5 +1,7 @@
 package lamp.filesystem.data;
 
+import lamp.util.ByteUtil;
+
 public class LFSSegment implements SegmentedData
 {
 	private byte[] data;
@@ -28,5 +30,13 @@ public class LFSSegment implements SegmentedData
 	public int getSize() 
 	{
 		return this.data.length;
+	}
+	
+	public boolean equals(LFSSegment segment)
+	{
+		if(!ByteUtil.compare(this.data, segment.data))
+			return false;
+		
+		return true;
 	}
 }

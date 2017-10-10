@@ -73,4 +73,19 @@ public class SegmentList<T extends SegmentedData> extends ArrayList<T>
 		
 		resetSize();
 	}
+	
+	public int getIndex(T element)
+	{
+		for(int index = 0; index < this.size(); index++)
+		{
+			T indexedElement = this.get(index);
+			
+			if(indexedElement == element)
+			{
+				return index;
+			}
+		}
+		
+		return 0;
+	}
 }

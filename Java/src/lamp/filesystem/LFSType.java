@@ -1,7 +1,6 @@
 package lamp.filesystem;
 
 import java.lang.reflect.Constructor;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,6 @@ import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 import lamp.util.ByteUtil;
-import lamp.util.Dump;
 
 /**
  * Lamp File System Type.
@@ -48,6 +46,8 @@ public abstract class LFSType
 	/*
 	 * FIELDS
 	 */
+	
+	protected LFS fileSystem;
 	
 	/**
 	 * Name of this type.
@@ -173,6 +173,11 @@ public abstract class LFSType
 	 * METHODS
 	 */
 	
+	public void setFileSystem(LFS lfs)
+	{
+		this.fileSystem = lfs;
+	}
+	
 	/**
 	 * 
 	 * @param size
@@ -219,16 +224,18 @@ public abstract class LFSType
 	 * 
 	 * @return
 	 */
-	public void separateSegments()
+	public SegmentList<LFSSegment> separateSegments(byte[] data)
 	{
-		List<byte[]> data = ByteUtil.split(this.segmentedData, this.segmentSize);
+		List<byte[]> dataList = ByteUtil.split(data, this.segmentSize);
 	
-		this.segments = new SegmentList<>();
+		SegmentList<LFSSegment> segments = new SegmentList<>();
 		
-		for(byte[] dat : data)
+		for(byte[] dat : dataList)
 		{
-			this.segments.add(new LFSSegment(dat));
+			segments.add(new LFSSegment(dat));
 		}
+		
+		return segments;
 	}
 	
 	/**
@@ -237,7 +244,7 @@ public abstract class LFSType
 	 */
 	public void writeSegments(LFSTypeOutputStream out)
 	{
-		this.separateSegments();
+		this.segments = this.separateSegments(this.segmentedData);
 		
 		int addrPosition = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
 		int position = addrPosition;
@@ -473,6 +480,77 @@ public abstract class LFSType
 		this.children = children;
 	}
 	
+	public void overwrite(LFSSegment segment, byte[] newData)
+	{
+		this.overwrite(segment.getAddress(), newData);
+	}
+	
+	public void overwrite(long segmentAddr, byte[] newData)
+	{
+		LFSSegment oldSegment = this.getSegment(segmentAddr);
+		int index = this.segments.getIndex(oldSegment);
+		
+		if(oldSegment == null)
+			return;
+		
+		int size = oldSegment.getSize();
+		byte[] newSegData = new byte[size];
+		
+		int copySize = newData.length;
+		
+		if(copySize > size)
+			copySize = size;
+		
+		System.arraycopy(newData, 0, newSegData, 0, copySize);
+		
+		LFSSegment newSegment = new LFSSegment(newSegData);
+		
+		this.segments.set(index, newSegment);
+	}
+	
+	public void delete()
+	{
+		for(LFSSegment segment : this.segments)
+		{
+			this.overwrite(segment, new byte[0]);
+		}
+	}
+	
+	public void update(byte[] data)
+	{
+		this.segments = this.separateSegments(this.segmentedData);
+		List<LFSSegment> updatedSegments = this.separateSegments(data);
+		
+		if(this.segments == null)
+			this.segments = new SegmentList<>();
+		
+		if(updatedSegments == null)
+			return;
+		
+		for(int index = 0; index < updatedSegments.size(); index++)
+		{
+			LFSSegment segment = null;
+			
+			if(index < this.segments.size())
+			{
+				segment = this.segments.get(index);
+			}
+			
+			LFSSegment updatedSegment = updatedSegments.get(index);
+			
+			if(segment != null)
+			{
+				if(segment.equals(updatedSegment))
+				{
+					continue;
+				}
+			}
+			
+			this.segments.ensureCapacity(index);
+			this.segments.set(index, updatedSegment);
+		}
+	}
+	
 	/*
 	 * RETURN METHODS
 	 */
@@ -550,6 +628,27 @@ public abstract class LFSType
 		return path;
 	}
 	
+	public LFS getFileSystem()
+	{
+		return this.fileSystem;
+	}
+	
+	public LFSSegment getSegment(long segmentAddr)
+	{
+		if(this.segments != null)
+		{
+			for(LFSSegment segment : this.segments)
+			{
+				if(segment.getAddress() == segmentAddr)
+				{
+					return segment;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
 	/*
 	 * STATIC METHODS
 	 */
@@ -564,7 +663,7 @@ public abstract class LFSType
 	 */
 	public static <T> LFSType load(Class<?> type, byte[] data)
 	{
-		if(type.isAssignableFrom(LFSType.class))
+		if(LFSType.class.isAssignableFrom(type))
 		{
 			try
 			{
@@ -574,14 +673,20 @@ public abstract class LFSType
 				LFSType instance = (LFSType) instanceConstructor.newInstance(new Object[0]);
 				
 				instance.load(new LFSTypeInputStream(data));
+				
+				return instance;
 			}
 			catch(Exception e)
 			{
 				e.printStackTrace();
 			}
 		}
+		else
+		{
+			throw new UnsupportedOperationException("Attempted to load LFSType with non-LFSType class.");
+		}
 		
-		throw new UnsupportedOperationException("Attempted to load LFSType with non-LFSType class.");
+		return null;
 	}
 	
 	/*

@@ -5,20 +5,20 @@ package lamp.filesystem;
  * 
  * @author Filip Jerkovic
  */
-public class LFSFlag
+public enum LFSFlag
 {
 	/**
 	 * Read Flag
 	 */
-	public static int READ = 1;
+	READ,
 	
 	/**
 	 * Write Flag
 	 */
-	public static int WRITE = 2;
+	WRITE,
 	
 	/**
 	 * Execute Flag
 	 */
-	public static int EXECUTE = 3;
+	EXECUTE;
 }

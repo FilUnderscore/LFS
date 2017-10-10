@@ -15,11 +15,11 @@ public class LFSTypeMetadata
 	 */
 	
 	/**
-	 * Flags set for the {@link LFSType}.
+	 * {@link LFSFlag}s set for the {@link LFSType}.
 	 * 
 	 * {@link LFSType}
 	 */
-	private int flags;
+	private LFSFlag[] flags;
 	
 	/**
 	 * Timestamp for {@link LFSType}'s creation.
@@ -37,7 +37,7 @@ public class LFSTypeMetadata
 	
 	LFSTypeMetadata()
 	{
-		this.flags = LFSFlag.READ | LFSFlag.WRITE | LFSFlag.EXECUTE;
+		this.flags = new LFSFlag[] { LFSFlag.READ, LFSFlag.WRITE, LFSFlag.EXECUTE };
 		
 		this.timestampCreated = System.currentTimeMillis();
 		
@@ -55,7 +55,11 @@ public class LFSTypeMetadata
 	 */
 	public void write(LFSTypeOutputStream out)
 	{
-		out.writeInt(this.flags);
+		out.writeInt(this.flags.length);
+		for(LFSFlag flag : this.flags)
+		{
+			out.writeInt(flag.ordinal());
+		}
 		
 		out.writeLong(this.timestampCreated);
 		
@@ -69,10 +73,32 @@ public class LFSTypeMetadata
 	 */
 	public void read(LFSTypeInputStream in)
 	{
-		this.flags = in.readInt();
+		this.flags = new LFSFlag[in.readInt()];
+		for(int index = 0; index < this.flags.length; index++)
+		{
+			this.flags[index] = LFSFlag.values()[in.readInt()];
+		}
 		
 		this.timestampCreated = in.readLong();
 		
 		this.timestampLastModified = in.readLong();
+	}
+	
+	/**
+	 * 
+	 */
+	public void update()
+	{
+		this.update(this.flags);
+	}
+	
+	/**
+	 * 
+	 * @param flags
+	 */
+	public void update(LFSFlag...flags)
+	{
+		this.flags = flags;
+		this.timestampLastModified = System.currentTimeMillis();
 	}
 }

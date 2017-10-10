@@ -17,6 +17,9 @@ public final class LFS
 	
 	public LFSDrive loadDrive(byte[] driveData)
 	{
+		if(driveData == null)
+			return null;
+		
 		LFSDrive drive = (LFSDrive) LFSType.load(LFSDrive.class, driveData);
 		
 		this.addDrive(drive);
@@ -26,11 +29,18 @@ public final class LFS
 	
 	public void addDrive(LFSDrive drive)
 	{
+		if(drive == null)
+			return;
+		
+		drive.setFileSystem(this);
 		drives.add(drive);
 	}
 	
 	public byte[] saveDrive(LFSDrive drive)
 	{
+		if(drive == null)
+			return null;
+		
 		LFSTypeOutputStream out = new LFSTypeOutputStream();
 		
 		drive.save(out);
@@ -53,6 +63,12 @@ public final class LFS
 			}
 		}
 		
+		return null;
+	}
+	
+	//TODO: Get list of currently used Drive IDs, and generate unique id.
+	public String assignDriveId()
+	{
 		return null;
 	}
 }

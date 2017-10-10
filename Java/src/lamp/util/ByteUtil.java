@@ -73,4 +73,23 @@ public final class ByteUtil
 		
 		return array;
 	}
+	
+	public static boolean compare(byte[] arr1, byte[] arr2)
+	{
+		if(arr1 == null || arr2 == null)
+			return false;
+		
+		if(arr1.length != arr2.length)
+			return false;
+		
+		for(int arrIndex = 0; arrIndex < arr1.length; arrIndex++)
+		{
+			if(arr1[arrIndex] != arr2[arrIndex])
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
 }
