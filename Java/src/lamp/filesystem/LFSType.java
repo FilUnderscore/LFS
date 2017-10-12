@@ -239,9 +239,9 @@ public abstract class LFSType
 	{
 		this.segments = this.separateSegments(this.segmentedData);
 		
-		int addrPosition = out.getCurrentPosition() + LFSTypeOutputStream.INT_SIZE;
+		int addrPosition = out.getCurrentPosition() + ByteUtil.INT_SIZE;
 		int position = addrPosition;
-		int addressSpace = LFSTypeOutputStream.LONG_SIZE * segments.size();
+		int addressSpace = ByteUtil.LONG_SIZE * segments.size();
 		int afterAddrPos = addrPosition + addressSpace;
 		
 		long closestSegment = 0x00;
@@ -386,7 +386,7 @@ public abstract class LFSType
 		this.childrenAddresses = new long[this.children.length];
 		
 		int addrLoc = out.getCurrentPosition();
-		int endOfAddressLoc = addrLoc + (this.children.length * LFSTypeOutputStream.LONG_SIZE);
+		int endOfAddressLoc = addrLoc + (this.children.length * ByteUtil.LONG_SIZE);
 		
 		out.toPosition(endOfAddressLoc);
 		
@@ -464,6 +464,10 @@ public abstract class LFSType
 		}
 	}
 	
+	/**
+	 * 
+	 * @param child
+	 */
 	public void addChild(LFSType... child)
 	{
 		if(this.children == null || this.children.length < 0)
@@ -482,11 +486,21 @@ public abstract class LFSType
 		this.children = children;
 	}
 	
+	/**
+	 * 
+	 * @param segment
+	 * @param newData
+	 */
 	public void overwrite(LFSSegment segment, byte[] newData)
 	{
 		this.overwrite(segment.getAddress(), newData);
 	}
 	
+	/**
+	 * 
+	 * @param segmentAddr
+	 * @param newData
+	 */
 	public void overwrite(long segmentAddr, byte[] newData)
 	{
 		LFSSegment oldSegment = this.getSegment(segmentAddr);
@@ -510,6 +524,9 @@ public abstract class LFSType
 		this.segments.set(index, newSegment);
 	}
 	
+	/**
+	 * 
+	 */
 	public void delete()
 	{
 		for(LFSSegment segment : this.segments)
@@ -518,6 +535,10 @@ public abstract class LFSType
 		}
 	}
 	
+	/**
+	 * 
+	 * @param data
+	 */
 	public void update(byte[] data)
 	{
 		this.segments = this.separateSegments(this.segmentedData);
@@ -603,6 +624,10 @@ public abstract class LFSType
 		return this.savedMemoryAddress;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public LFSType getRootParent()
 	{
 		if(this.parent == null)
@@ -618,6 +643,10 @@ public abstract class LFSType
 		return parent;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getFullPath()
 	{
 		String path = this.getPath();
@@ -628,6 +657,10 @@ public abstract class LFSType
 		return path;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getPath()
 	{
 		String path = "";
@@ -645,6 +678,11 @@ public abstract class LFSType
 		return path;
 	}
 	
+	/**
+	 * 
+	 * @param segmentAddr
+	 * @return
+	 */
 	public LFSSegment getSegment(long segmentAddr)
 	{
 		if(this.segments != null)

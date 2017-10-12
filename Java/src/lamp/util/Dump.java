@@ -2,8 +2,17 @@ package lamp.util;
 
 import javax.xml.bind.DatatypeConverter;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public final class Dump 
 {
+	/**
+	 * 
+	 * @param data
+	 * @return
+	 */
 	public static String printHex(byte[] data)
 	{
 		String str = DatatypeConverter.printHexBinary(data);

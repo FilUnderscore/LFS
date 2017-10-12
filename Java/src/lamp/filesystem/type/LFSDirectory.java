@@ -8,18 +8,32 @@ import lamp.filesystem.LFSType;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public class LFSDirectory extends LFSType
 {
+	/**
+	 * 
+	 * @param name
+	 */
 	public LFSDirectory(String name) 
 	{
 		super(name);
 	}
 	
+	/**
+	 * 
+	 */
 	public void save(LFSTypeOutputStream out)
 	{
 		super.save(out);
 	}
 	
+	/**
+	 * 
+	 */
 	public void load(LFSTypeInputStream in)
 	{
 		super.load(in);
@@ -29,6 +43,10 @@ public class LFSDirectory extends LFSType
 	 * METHODS
 	 */
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public LFSDirectory[] getDirectories()
 	{
 		List<LFSDirectory> dirs = new ArrayList<>();
@@ -48,6 +66,10 @@ public class LFSDirectory extends LFSType
 		return dirs.toArray(new LFSDirectory[dirs.size()]);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public LFSFile[] getFiles()
 	{
 		List<LFSFile> files = new ArrayList<>();
@@ -63,6 +85,11 @@ public class LFSDirectory extends LFSType
 		return files.toArray(new LFSFile[files.size()]);
 	}
 	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 */
 	public LFSFile createFile(LFSFile file)
 	{
 		this.addChild(file);
@@ -70,6 +97,11 @@ public class LFSDirectory extends LFSType
 		return file;
 	}
 	
+	/**
+	 * 
+	 * @param directory
+	 * @return
+	 */
 	public LFSDirectory createDirectory(LFSDirectory directory)
 	{
 		this.addChild(directory);
@@ -77,11 +109,21 @@ public class LFSDirectory extends LFSType
 		return directory;
 	}
 	
+	/**
+	 * 
+	 * @param fileName
+	 * @return
+	 */
 	public LFSFile createFile(String fileName)
 	{
 		return createFile(new LFSFile(fileName));
 	}
 	
+	/**
+	 * 
+	 * @param directoryName
+	 * @return
+	 */
 	public LFSDirectory createDirectory(String directoryName)
 	{
 		return createDirectory(new LFSDirectory(directoryName));

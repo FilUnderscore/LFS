@@ -3,8 +3,23 @@ package lamp.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public final class ByteUtil 
 {
+	public static int BOOLEAN_SIZE = 1;
+	public static int SHORT_SIZE = 2;
+	public static int INT_SIZE = 4;
+	public static int LONG_SIZE = 8;
+	
+	/**
+	 * 
+	 * @param input
+	 * @param finalSize
+	 * @return
+	 */
 	public static byte[] merge(List<byte[]> input, int finalSize)
 	{
 		byte[] output = new byte[finalSize];
@@ -24,6 +39,12 @@ public final class ByteUtil
 		return output;
 	}
 	
+	/**
+	 * 
+	 * @param input
+	 * @param per
+	 * @return
+	 */
 	public static List<byte[]> split(byte[] input, int per)
 	{
 		List<byte[]> array = new ArrayList<>();
@@ -59,6 +80,11 @@ public final class ByteUtil
 		return array;
 	}
 	
+	/**
+	 * 
+	 * @param primitiveList
+	 * @return
+	 */
 	public static byte[] listToPrimitive(List<Byte> primitiveList)
 	{
 		byte[] array = new byte[primitiveList.size()];
@@ -74,6 +100,12 @@ public final class ByteUtil
 		return array;
 	}
 	
+	/**
+	 * 
+	 * @param arr1
+	 * @param arr2
+	 * @return
+	 */
 	public static boolean compare(byte[] arr1, byte[] arr2)
 	{
 		if(arr1 == null || arr2 == null)

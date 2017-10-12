@@ -19,6 +19,11 @@ import lamp.util.Dump;
  */
 public class Main 
 {
+	/**
+	 * Program Start.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args)
 	{
 		LFS.initialize();
@@ -30,6 +35,9 @@ public class Main
 		test2();
 	}
 	
+	/**
+	 * Write Test
+	 */
 	public static void test1()
 	{
 		LFSDrive lfsDrive = new LFSDrive("A:", "Drive");
@@ -54,8 +62,14 @@ public class Main
 		}
 	}
 	
+	/**
+	 * Read/Write Test Data (Byte Array)
+	 */
 	private static byte[] test12;
 	
+	/**
+	 * Read Test
+	 */
 	public static void test2()
 	{
 		LFSDrive drive = LFS.loadDrive(test12);

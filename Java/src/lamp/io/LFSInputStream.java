@@ -1,5 +1,9 @@
 package lamp.io;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public class LFSInputStream 
 {
 	/**

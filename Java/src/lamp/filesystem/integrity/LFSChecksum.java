@@ -19,10 +19,76 @@ import lamp.util.Hash;
  */
 public class LFSChecksum 
 {
-	public byte[] md5;
-	public byte[] sha512;
+	/**
+	 * 
+	 */
+	private byte[] md5;
+	
+	/**
+	 * 
+	 */
+	private byte[] sha512;
 
+	/**
+	 * 
+	 */
 	private LFSChecksum() {}
+	
+	/**
+	 * 
+	 * @param fileName
+	 * @param checksumFileName
+	 */
+	private static void deleteFile(String fileName, String checksumFileName)
+	{
+		//Use LFS file delete handler and notify user..
+	}
+	
+	/**
+	 * Confirm checksum of the file bytes.
+	 * 
+	 * @param file [e.g. file name: file.ext]
+	 */
+	public boolean confirmChecksum(byte[] fileBytes)
+	{
+		try
+		{
+			if(Hash.md5Hash(fileBytes) != this.md5 || Hash.sha512Hash(fileBytes) != this.sha512)
+			{
+				return false;
+			}
+			
+			return true;
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param newFileBytes
+	 */
+	public void updateChecksum(byte[] newFileBytes)
+	{
+		try
+		{
+			this.md5 = Hash.md5Hash(newFileBytes);
+			
+			this.sha512 = Hash.sha512Hash(newFileBytes);
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	 * RETURN METHODS 
+	 */
 	
 	/**
 	 * 
@@ -76,6 +142,12 @@ public class LFSChecksum
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param fileName
+	 * @param fileBytes
+	 * @return
+	 */
 	private static LFSChecksum save(String fileName, byte[] fileBytes) 
 	{
 		LFSChecksum checksum = new LFSChecksum();
@@ -85,11 +157,6 @@ public class LFSChecksum
 		//Files.write(Paths.get(fileName + ".chksum"), checksum.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 		
 		return checksum;
-	}
-
-	private static void deleteFile(String fileName, String checksumFileName)
-	{
-		//Use LFS file delete handler and notify user..
 	}
 	
 	/**
@@ -122,43 +189,9 @@ public class LFSChecksum
 	}
 	
 	/**
-	 * Confirm checksum of the file bytes.
 	 * 
-	 * @param file [e.g. file name: file.ext]
+	 * @return
 	 */
-	public boolean confirmChecksum(byte[] fileBytes)
-	{
-		try
-		{
-			if(Hash.md5Hash(fileBytes) != this.md5 || Hash.sha512Hash(fileBytes) != this.sha512)
-			{
-				return false;
-			}
-			
-			return true;
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-		
-		return false;
-	}
-	
-	public void updateChecksum(byte[] newFileBytes)
-	{
-		try
-		{
-			this.md5 = Hash.md5Hash(newFileBytes);
-			
-			this.sha512 = Hash.sha512Hash(newFileBytes);
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-	
 	public byte[] getBytes()
 	{
 		LFSTypeOutputStream out = new LFSTypeOutputStream();

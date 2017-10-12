@@ -11,28 +11,86 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class SegmentList<T extends SegmentedData> extends ArrayList<T> 
 {
+	//TODO: Create a custom List/ArrayList class that doesn't rely on Java libraries.
+	
+	/*
+	 * FIELDS
+	 */
+	
+	/**
+	 * 
+	 */
 	private int totalSize;
 	
-	public int getTotalSize()
-	{
-		return this.totalSize;
-	}
+	/*
+	 * METHODS
+	 */
 	
+	/**
+	 * 
+	 * @param size
+	 */
 	private void incrementSize(int size)
 	{
 		this.totalSize += size;
 	}
 	
+	/**
+	 * 
+	 * @param size
+	 */
 	private void decrementSize(int size)
 	{
 		this.totalSize -= size;
 	}
 	
+	/**
+	 * 
+	 */
 	private void resetSize()
 	{
 		this.totalSize = 0;
 	}
 	
+	/**
+	 * 
+	 */
+	public void clear()
+	{
+		super.clear();
+		
+		resetSize();
+	}
+	
+	/**
+	 * 
+	 * @param index
+	 * @param element
+	 */
+	public void add(int index, T element)
+	{
+		super.add(index, element);
+		
+		incrementSize(element.getSize());
+	}
+	
+	/*
+	 * RETURN METHODS
+	 */
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public int getTotalSize()
+	{
+		return this.totalSize;
+	}
+	
+	/**
+	 * 
+	 * @param e
+	 */
 	public boolean add(T e)
 	{
 		boolean add = super.add(e);
@@ -42,13 +100,10 @@ public class SegmentList<T extends SegmentedData> extends ArrayList<T>
 		return add;
 	}
 	
-	public void add(int index, T element)
-	{
-		super.add(index, element);
-		
-		incrementSize(element.getSize());
-	}
-	
+	/**
+	 * 
+	 * @param index
+	 */
 	public T remove(int index)
 	{
 		T remove = super.remove(index);
@@ -58,6 +113,11 @@ public class SegmentList<T extends SegmentedData> extends ArrayList<T>
 		return remove;
 	}
 	
+	/**
+	 * 
+	 * @param e
+	 * @return
+	 */
 	public boolean remove(T e)
 	{
 		boolean remove = super.remove(e);
@@ -67,13 +127,11 @@ public class SegmentList<T extends SegmentedData> extends ArrayList<T>
 		return remove;
 	}
 	
-	public void clear()
-	{
-		super.clear();
-		
-		resetSize();
-	}
-	
+	/**
+	 * 
+	 * @param element
+	 * @return
+	 */
 	public int getIndex(T element)
 	{
 		for(int index = 0; index < this.size(); index++)

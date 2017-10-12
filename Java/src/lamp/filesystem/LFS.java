@@ -8,15 +8,30 @@ import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public final class LFS 
 {
+	/**
+	 * 
+	 */
 	private static List<LFSDrive> drives;
 	
+	/**
+	 * 
+	 */
 	public static void initialize()
 	{
 		drives = new ArrayList<>();
 	}
 	
+	/**
+	 * 
+	 * @param driveData
+	 * @return
+	 */
 	public static LFSDrive loadDrive(byte[] driveData)
 	{
 		if(driveData == null)
@@ -29,6 +44,11 @@ public final class LFS
 		return drive;
 	}
 	
+	/**
+	 * 
+	 * @param drive
+	 * @return
+	 */
 	public static byte[] unloadDrive(LFSDrive drive)
 	{
 		if(drive == null)
@@ -42,6 +62,10 @@ public final class LFS
 		return data;
 	}
 	
+	/**
+	 * 
+	 * @param drive
+	 */
 	public static void addDrive(LFSDrive drive)
 	{
 		if(drive == null)
@@ -50,6 +74,10 @@ public final class LFS
 		drives.add(drive);
 	}
 	
+	/**
+	 * 
+	 * @param drive
+	 */
 	private static void removeDrive(LFSDrive drive)
 	{
 		if(drive == null)
@@ -58,6 +86,11 @@ public final class LFS
 		drives.remove(drive);
 	}
 	
+	/**
+	 * 
+	 * @param drive
+	 * @return
+	 */
 	public static byte[] saveDrive(LFSDrive drive)
 	{
 		if(drive == null)
@@ -70,11 +103,21 @@ public final class LFS
 		return out.getBuffer();
 	}
 	
+	/**
+	 * 
+	 * @param driveId
+	 * @return
+	 */
 	public static byte[] saveDrive(String driveId)
 	{
 		return saveDrive(getDrive(driveId));
 	}
 	
+	/**
+	 * 
+	 * @param driveId
+	 * @return
+	 */
 	public static LFSDrive getDrive(String driveId)
 	{
 		for(LFSDrive drive : drives)
@@ -89,6 +132,10 @@ public final class LFS
 	}
 	
 	//TODO: Get list of currently used Drive IDs, and generate unique id.
+	/**
+	 * 
+	 * @return
+	 */
 	public static String assignDriveId()
 	{
 		return "D";
@@ -98,11 +145,20 @@ public final class LFS
 	 * SEARCH FILESYSTEM METHODS
 	 */
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public static List<LFSDrive> getDrives()
 	{
 		return Collections.unmodifiableList(drives);
 	}
 	
+	/**
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	public static LFSFile getFile(String filePath)
 	{
 		for(LFSDrive drive : drives)
@@ -123,6 +179,11 @@ public final class LFS
 	 * FILESYSTEM CREATE/DELETE METHODS
 	 */
 	
+	/**
+	 * 
+	 * @param filePath
+	 * @return
+	 */
 	public static LFSFile createFile(String filePath)
 	{
 		//Parse drive/directory tree..

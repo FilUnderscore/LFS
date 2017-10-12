@@ -6,20 +6,34 @@ import java.nio.charset.StandardCharsets;
 
 import lamp.io.LFSInputStream;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public class LFSTypeInputStream extends LFSInputStream
 {
+	/**
+	 * 
+	 * @param buf
+	 */
 	public LFSTypeInputStream(byte[] buf) 
 	{
 		super(buf);
 	}
-
-	public static int BOOLEAN_SIZE = 1;
-	public static int SHORT_SIZE = 2;
-	public static int INT_SIZE = 4;
-	public static int LONG_SIZE = 8;
 	
+	/**
+	 * 
+	 */
 	private static ByteOrder ENDIANNESS = ByteOrder.BIG_ENDIAN;
 	
+	/*
+	 * RETURN METHODS
+	 */
+	
+	/**
+	 * 
+	 * @return
+	 */
 	public boolean readBoolean()
 	{
 		byte[] array = this.readArray(BOOLEAN_SIZE);
@@ -31,6 +45,10 @@ public class LFSTypeInputStream extends LFSInputStream
 		return result;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public int readInt()
 	{
 		byte[] array = this.readArray(INT_SIZE);
@@ -40,6 +58,10 @@ public class LFSTypeInputStream extends LFSInputStream
 		return n;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public long readLong()
 	{
 		byte[] array = this.readArray(LONG_SIZE);
@@ -49,6 +71,10 @@ public class LFSTypeInputStream extends LFSInputStream
 		return n;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String readString()
 	{
 		int arrayLength = this.readInt();
@@ -60,6 +86,10 @@ public class LFSTypeInputStream extends LFSInputStream
 		return str;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public byte[] readArray()
 	{
 		int arrayLength = this.readInt();

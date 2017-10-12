@@ -5,29 +5,64 @@ import java.util.List;
 
 import lamp.util.ByteUtil;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public class LFSOutputStream
 {
+	/**
+	 * 
+	 */
 	protected ArrayList<Byte> buffer;
 	
+	/**
+	 * 
+	 */
 	protected int position;
+	
+	/**
+	 * 
+	 */
 	protected int length;
 	
+	/**
+	 * 
+	 */
 	public LFSOutputStream()
 	{
 		this(0);
 	}
 	
+	/**
+	 * 
+	 * @param startingSize
+	 */
 	public LFSOutputStream(int startingSize)
 	{
 		this.length = startingSize;
 		this.buffer = new ArrayList<Byte>(startingSize);
 	}
 	
+	/**
+	 * 
+	 * @param data
+	 * @param offset
+	 * @param length
+	 */
 	public void write(byte[] data, int offset, int length)
 	{
 		this.write(data, offset, length, true);
 	}
 	
+	/**
+	 * 
+	 * @param position
+	 * @param data
+	 * @param offset
+	 * @param length
+	 * @param overwrite
+	 */
 	public void write(int position, byte[] data, int offset, int length, boolean overwrite)
 	{
 		this.position = position;
@@ -49,11 +84,22 @@ public class LFSOutputStream
 		}
 	}
 	
+	/**
+	 * 
+	 * @param data
+	 * @param offset
+	 * @param length
+	 * @param overwrite
+	 */
 	public void write(byte[] data, int offset, int length, boolean overwrite)
 	{
 		this.write(this.position, data, offset, length, overwrite);
 	}
 	
+	/**
+	 * 
+	 * @param newLength
+	 */
 	protected void grow(int newLength)
 	{
 		while(this.length < newLength)
@@ -63,16 +109,28 @@ public class LFSOutputStream
 		}
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public int getCurrentPosition()
 	{
 		return this.position;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public byte[] getBuffer()
 	{
 		return ByteUtil.listToPrimitive(this.buffer);
 	}
 	
+	/**
+	 * 
+	 * @param size
+	 */
 	public void ifCurrentPositionAvailableThenSet(int size)
 	{
 		int pos = this.position;
@@ -105,6 +163,10 @@ public class LFSOutputStream
 		}
 	}
 	
+	/**
+	 * 
+	 * @param position
+	 */
 	public void toPosition(int position)
 	{
 		//Grow if needed.

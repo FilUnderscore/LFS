@@ -9,10 +9,21 @@ import lamp.filesystem.LFSType;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 
+/**
+ * 
+ * @author Filip Jerkovic
+ */
 public class LFSDrive extends LFSType
 {
+	/**
+	 * 
+	 */
 	private String driveId;
 	
+	/**
+	 * 
+	 * @param name
+	 */
 	public LFSDrive(String name)
 	{
 		super(name);
@@ -20,6 +31,11 @@ public class LFSDrive extends LFSType
 		this.driveId = LFS.assignDriveId();
 	}
 	
+	/**
+	 * 
+	 * @param driveId
+	 * @param name
+	 */
 	public LFSDrive(String driveId, String name) 
 	{
 		super(name);
@@ -31,6 +47,10 @@ public class LFSDrive extends LFSType
 	 * OVERRIDEN METHODS
 	 */
 	
+	/**
+	 * 
+	 * @param in
+	 */
 	public void load(LFSTypeInputStream in)
 	{
 		//TODO: Jump to position 2 in Buffer and read Bootsector header for LFS.
@@ -41,6 +61,10 @@ public class LFSDrive extends LFSType
 		super.load(in);
 	}
 	
+	/**
+	 * 
+	 * @param out
+	 */
 	public void save(LFSTypeOutputStream out)
 	{
 		//TODO: Jump to position 2 in Buffer and write Bootsector header for LFS.
@@ -55,11 +79,19 @@ public class LFSDrive extends LFSType
 	 * METHODS
 	 */
 	
+	/**
+	 * 
+	 */
 	public void eject()
 	{
-		//Call to LFS, or call from LFS.
+		//TODO: Call to LFS, or call from LFS.
 	}
 	
+	/**
+	 * 
+	 * @param directory
+	 * @return
+	 */
 	public LFSDirectory createDirectory(LFSDirectory directory)
 	{
 		this.addChild(directory);
@@ -67,6 +99,11 @@ public class LFSDrive extends LFSType
 		return directory;
 	}
 	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 */
 	public LFSFile createFile(LFSFile file)
 	{
 		this.addChild(file);
@@ -74,16 +111,30 @@ public class LFSDrive extends LFSType
 		return file;
 	}
 	
+	/**
+	 * 
+	 * @param directoryName
+	 * @return
+	 */
 	public LFSDirectory createDirectory(String directoryName)
 	{
 		return createDirectory(new LFSDirectory(directoryName));
 	}
 	
+	/**
+	 * 
+	 * @param fileName
+	 * @return
+	 */
 	public LFSFile createFile(String fileName)
 	{
 		return createFile(new LFSFile(fileName));
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public LFSDirectory[] getDirectories()
 	{
 		List<LFSDirectory> dirs = new ArrayList<>();
@@ -103,6 +154,10 @@ public class LFSDrive extends LFSType
 		return dirs.toArray(new LFSDirectory[dirs.size()]);
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public LFSFile[] getFiles()
 	{
 		List<LFSFile> files = new ArrayList<>();
@@ -122,6 +177,10 @@ public class LFSDrive extends LFSType
 	 * RETURN METHODS
 	 */
 	
+	/**
+	 * 
+	 * @return
+	 */
 	public String getDriveId()
 	{
 		return this.driveId;

@@ -102,6 +102,10 @@ public class LFSTypeMetadata
 		this.timestampLastModified = System.currentTimeMillis();
 	}
 	
+	/*
+	 * RETURN METHODS
+	 */
+	
 	public String toString()
 	{
 		return "{flags = " + flags.toString() + ", " + "timestampCreated = " + timestampCreated + ", timestampLastModified = " + timestampLastModified + "}";
