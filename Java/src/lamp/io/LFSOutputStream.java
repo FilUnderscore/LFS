@@ -90,14 +90,18 @@ public class LFSOutputStream
 			//Go to next position, if this position is not empty.
 			if(buffer.get(pos) != 0)
 			{
-				toPosition(pos++);
+				toPosition(pos);
 				
 				//Reset empty counter, because address has data within, 
 				//and not enough space to squeeze in.
 				empty = 0;
 			}
 			else
+			{
 				empty++;
+			}
+			
+			pos++;
 		}
 	}
 	

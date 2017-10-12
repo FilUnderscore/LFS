@@ -8,35 +8,55 @@ import lamp.filesystem.type.LFSDrive;
 
 public final class LFS 
 {
-	private List<LFSDrive> drives;
+	private static List<LFSDrive> drives;
 	
-	public LFS()
+	public static void initialize()
 	{
-		this.drives = new ArrayList<>();
+		drives = new ArrayList<>();
 	}
 	
-	public LFSDrive loadDrive(byte[] driveData)
+	public static LFSDrive loadDrive(byte[] driveData)
 	{
 		if(driveData == null)
 			return null;
 		
 		LFSDrive drive = (LFSDrive) LFSType.load(LFSDrive.class, driveData);
 		
-		this.addDrive(drive);
+		addDrive(drive);
 		
 		return drive;
 	}
 	
-	public void addDrive(LFSDrive drive)
+	public static byte[] unloadDrive(LFSDrive drive)
+	{
+		if(drive == null)
+			return null;
+		
+		byte[] data = saveDrive(drive);
+		
+		drive.eject();
+		removeDrive(drive);
+		
+		return data;
+	}
+	
+	public static void addDrive(LFSDrive drive)
 	{
 		if(drive == null)
 			return;
 		
-		drive.setFileSystem(this);
 		drives.add(drive);
 	}
 	
-	public byte[] saveDrive(LFSDrive drive)
+	private static void removeDrive(LFSDrive drive)
+	{
+		if(drive == null)
+			return;
+		
+		drives.remove(drive);
+	}
+	
+	public static byte[] saveDrive(LFSDrive drive)
 	{
 		if(drive == null)
 			return null;
@@ -48,14 +68,14 @@ public final class LFS
 		return out.getBuffer();
 	}
 	
-	public byte[] saveDrive(String driveId)
+	public static byte[] saveDrive(String driveId)
 	{
 		return saveDrive(getDrive(driveId));
 	}
 	
-	public LFSDrive getDrive(String driveId)
+	public static LFSDrive getDrive(String driveId)
 	{
-		for(LFSDrive drive : this.drives)
+		for(LFSDrive drive : drives)
 		{
 			if(drive.getDriveId() == driveId)
 			{
@@ -67,8 +87,8 @@ public final class LFS
 	}
 	
 	//TODO: Get list of currently used Drive IDs, and generate unique id.
-	public String assignDriveId()
+	public static String assignDriveId()
 	{
-		return null;
+		return "D";
 	}
 }

@@ -1,5 +1,6 @@
 package lamp.filesystem.type;
 
+import lamp.filesystem.LFS;
 import lamp.filesystem.LFSType;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
@@ -12,7 +13,7 @@ public class LFSDrive extends LFSType
 	{
 		super(name);
 		
-		this.driveId = this.getFileSystem().assignDriveId();
+		this.driveId = LFS.assignDriveId();
 	}
 	
 	public LFSDrive(String driveId, String name) 

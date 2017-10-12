@@ -21,17 +21,16 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		//TEST -- START
-		LFS lfs = new LFS();
+		LFS.initialize();
 		
 		//Write Test
-		test1(lfs);
+		test1();
 		
 		//Read Test
-		test2(lfs);
+		test2();
 	}
 	
-	public static void test1(LFS lfs)
+	public static void test1()
 	{
 		LFSDrive lfsDrive = new LFSDrive("A:", "Drive");
 		
@@ -42,21 +41,27 @@ public class Main
 		lfsDir.addChild(new LFSFile("test", 2, new byte[] { (byte)0xEB, (byte)0x00, (byte)0xAA, (byte)0xBB, (byte)0xCC, (byte)0xDD, (byte)0xEE, (byte)0xFF }));
 		lfsDir.addChild(new LFSFile("file", 4, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 }));
 		
-		lfs.addDrive(lfsDrive);
+		LFS.addDrive(lfsDrive);
 		
-		byte[] data = lfs.saveDrive(lfsDrive.getDriveId());
+		test12 = LFS.unloadDrive(lfsDrive);
 		
-		System.out.println("Data: " + Dump.printHex(data));
+		System.out.println("Data: " + Dump.printHex(test12));
 		
 		try {
-			Files.write(Paths.get("test.bin"), data, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+			Files.write(Paths.get("test.bin"), test12, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public static void test2(LFS lfs)
+	private static byte[] test12;
+	
+	public static void test2()
 	{
-		lfs.loadDrive(lfs.saveDrive("A:"));
+		LFSDrive drive = LFS.loadDrive(test12);
+		
+		test12 = LFS.unloadDrive(drive);
+		
+		System.out.println("Data: " + Dump.printHex(test12));
 	}
 }

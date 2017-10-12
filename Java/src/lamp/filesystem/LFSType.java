@@ -1,6 +1,7 @@
 package lamp.filesystem;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +47,7 @@ public abstract class LFSType
 	/*
 	 * FIELDS
 	 */
-	
-	protected LFS fileSystem;
-	
+		
 	/**
 	 * Name of this type.
 	 */
@@ -172,11 +171,6 @@ public abstract class LFSType
 	/*
 	 * METHODS
 	 */
-	
-	public void setFileSystem(LFS lfs)
-	{
-		this.fileSystem = lfs;
-	}
 	
 	/**
 	 * 
@@ -626,11 +620,6 @@ public abstract class LFSType
 		return path;
 	}
 	
-	public LFS getFileSystem()
-	{
-		return this.fileSystem;
-	}
-	
 	public LFSSegment getSegment(long segmentAddr)
 	{
 		if(this.segments != null)
@@ -665,10 +654,10 @@ public abstract class LFSType
 		{
 			try
 			{
-				Constructor<?> instanceConstructor = type.getConstructor(new Class[0]);
+				Constructor<?> instanceConstructor = type.getConstructor(String.class);
 				instanceConstructor.setAccessible(true);
 				
-				LFSType instance = (LFSType) instanceConstructor.newInstance(new Object[0]);
+				LFSType instance = (LFSType) instanceConstructor.newInstance(new Object[] { "" });
 				
 				instance.load(new LFSTypeInputStream(data));
 				
