@@ -1,13 +1,9 @@
 package lamp.filesystem.integrity;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
+import lamp.filesystem.LFS;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
+import lamp.filesystem.type.LFSFile;
 import lamp.util.Hash;
 
 /**
@@ -33,32 +29,33 @@ public class LFSChecksum
 	 * @param fileName (Includes path directory)
 	 * @return
 	 */
-	public static LFSChecksum load(String fileName) throws IOException
+	public static LFSChecksum load(String filePath)
 	{
 		LFSChecksum checksum;
 		
-		String checksumFile = fileName + ".chksum";
+		String checksumFilePath = filePath + ".chksum";
 		
-		byte[] fileBytes = Files.readAllBytes(Paths.get(fileName));
+		byte[] fileBytes = LFS.getFile(filePath).getData();
 		
+		LFSFile checksumFile = LFS.getFile(checksumFilePath);
 		
 		//Checksum has not been made for file, either because it's new or modified.
-		if(!new File(checksumFile).exists())
+		if(checksumFile == null)
 		{
-			checksum = save(fileName, fileBytes);
+			checksum = save(filePath, fileBytes);
 			
 			return checksum;
 		}
 		else
 		{
-			byte[] checksumFileBytes = Files.readAllBytes(Paths.get(checksumFile));
+			byte[] checksumFileBytes = checksumFile.getData();
 			
 			checksum = loadChecksum(checksumFileBytes);
 			
 			// No checksum or invalid checksum data.
 			if(checksum == null)
 			{
-				checksum = save(fileName, fileBytes);
+				checksum = save(filePath, fileBytes);
 				
 				return checksum;
 			}
@@ -67,7 +64,7 @@ public class LFSChecksum
 				if(!checksum.confirmChecksum(fileBytes))
 				{
 					//Deletes the file and it's checksum file.
-					deleteFile(fileName, checksumFile);
+					deleteFile(filePath, checksumFilePath);
 				}
 				else
 				{
@@ -79,13 +76,13 @@ public class LFSChecksum
 		return null;
 	}
 	
-	private static LFSChecksum save(String fileName, byte[] fileBytes) throws IOException 
+	private static LFSChecksum save(String fileName, byte[] fileBytes) 
 	{
 		LFSChecksum checksum = new LFSChecksum();
 		
 		checksum.updateChecksum(fileBytes);
 		
-		Files.write(Paths.get(fileName + ".chksum"), checksum.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+		//Files.write(Paths.get(fileName + ".chksum"), checksum.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 		
 		return checksum;
 	}

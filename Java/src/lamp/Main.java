@@ -60,6 +60,14 @@ public class Main
 	{
 		LFSDrive drive = LFS.loadDrive(test12);
 		
+		System.out.println("");
+		System.out.println("Drive Data:");
+		System.out.println("ID: " + drive.getDriveId());
+		System.out.println("Name: " + drive.getName());
+		System.out.println("Children: " + drive.getChildren().length);
+		System.out.println("Metadata: " + drive.getMetadata().toString());
+		System.out.println("");
+		
 		test12 = LFS.unloadDrive(drive);
 		
 		System.out.println("Data: " + Dump.printHex(test12));

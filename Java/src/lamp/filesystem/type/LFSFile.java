@@ -33,4 +33,9 @@ public class LFSFile extends LFSType
 		
 		this.writeSegments(out);
 	}	
+	
+	public byte[] getData()
+	{
+		return this.segmentedData;
+	}
 }

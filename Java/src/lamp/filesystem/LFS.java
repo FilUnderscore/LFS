@@ -1,10 +1,12 @@
 package lamp.filesystem;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDrive;
+import lamp.filesystem.type.LFSFile;
 
 public final class LFS 
 {
@@ -90,5 +92,44 @@ public final class LFS
 	public static String assignDriveId()
 	{
 		return "D";
+	}
+	
+	/*
+	 * SEARCH FILESYSTEM METHODS
+	 */
+	
+	public static List<LFSDrive> getDrives()
+	{
+		return Collections.unmodifiableList(drives);
+	}
+	
+	public static LFSFile getFile(String filePath)
+	{
+		for(LFSDrive drive : drives)
+		{
+			for(LFSFile file : drive.getFiles())
+			{
+				if(file.getFullPath().equalsIgnoreCase(filePath))
+				{
+					return file;
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	/*
+	 * FILESYSTEM CREATE/DELETE METHODS
+	 */
+	
+	public static LFSFile createFile(String filePath)
+	{
+		//Parse drive/directory tree..
+		
+		
+		String fileName = "";
+		
+		return new LFSFile(fileName);
 	}
 }

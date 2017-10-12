@@ -1,5 +1,9 @@
 package lamp.filesystem.type;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import lamp.filesystem.LFS;
 import lamp.filesystem.LFSType;
 import lamp.filesystem.io.LFSTypeInputStream;
@@ -47,9 +51,71 @@ public class LFSDrive extends LFSType
 		super.save(out);
 	}
 	
+	/*
+	 * METHODS
+	 */
+	
 	public void eject()
 	{
 		//Call to LFS, or call from LFS.
+	}
+	
+	public LFSDirectory createDirectory(LFSDirectory directory)
+	{
+		this.addChild(directory);
+		
+		return directory;
+	}
+	
+	public LFSFile createFile(LFSFile file)
+	{
+		this.addChild(file);
+		
+		return file;
+	}
+	
+	public LFSDirectory createDirectory(String directoryName)
+	{
+		return createDirectory(new LFSDirectory(directoryName));
+	}
+	
+	public LFSFile createFile(String fileName)
+	{
+		return createFile(new LFSFile(fileName));
+	}
+	
+	public LFSDirectory[] getDirectories()
+	{
+		List<LFSDirectory> dirs = new ArrayList<>();
+		
+		for(LFSType type : this.children)
+		{
+			if(type instanceof LFSDirectory)
+			{
+				LFSDirectory dir = (LFSDirectory) type;
+				
+				dirs.add(dir);
+				
+				dirs.addAll(Arrays.asList(dir.getDirectories()));
+			}
+		}
+		
+		return dirs.toArray(new LFSDirectory[dirs.size()]);
+	}
+	
+	public LFSFile[] getFiles()
+	{
+		List<LFSFile> files = new ArrayList<>();
+		
+		for(LFSDirectory dir : this.getDirectories())
+		{
+			for(LFSFile file : dir.getFiles())
+			{
+				files.add(file);
+			}
+		}
+		
+		return files.toArray(new LFSFile[files.size()]);
 	}
 	
 	/*

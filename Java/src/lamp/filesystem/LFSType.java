@@ -1,7 +1,6 @@
 package lamp.filesystem;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -382,19 +381,29 @@ public abstract class LFSType
 			out.writeBoolean(true);
 		}
 		
+		out.writeInt(this.children.length);
+		
 		this.childrenAddresses = new long[this.children.length];
+		
+		int addrLoc = out.getCurrentPosition();
+		int endOfAddressLoc = addrLoc + (this.children.length * LFSTypeOutputStream.LONG_SIZE);
+		
+		out.toPosition(endOfAddressLoc);
 		
 		for(int childIndex = 0; childIndex < this.children.length; childIndex++)
 		{
 			this.children[childIndex].save(out);
+			
+			System.out.println("Child Address: " + this.children[childIndex].savedMemoryAddress);
+			
 			this.childrenAddresses[childIndex] = this.children[childIndex].savedMemoryAddress;
 		}
 		
-		int childrenAddressesLength = this.childrenAddresses.length;
-		out.writeInt(childrenAddressesLength);
-		
+		out.toPosition(addrLoc);
 		for(long l : this.childrenAddresses)
 		{
+			System.out.println("Child Addresse: " + l);
+			
 			out.writeLong(l);
 		}
 	}
@@ -408,25 +417,26 @@ public abstract class LFSType
 		if(!in.readBoolean())
 			return;
 		
-		int childrenAddressesLength = in.readInt();
+		int childrenLength = in.readInt();
 		
-		this.childrenAddresses = new long[childrenAddressesLength];
-		this.children = new LFSType[childrenAddressesLength];
+		this.children = new LFSType[childrenLength];
+		this.childrenAddresses = new long[childrenLength];
 		
-		for(int childrenAddressesIndex = 0; childrenAddressesIndex < childrenAddressesLength; childrenAddressesIndex++)
+		for(int childIndex = 0; childIndex < childrenLength; childIndex++)
 		{
-			long childrenAddress = in.readLong();
+			long childAddress = in.readLong();
+			System.out.println(childAddress);
 			
-			this.childrenAddresses[childrenAddressesIndex] = childrenAddress;
+			this.childrenAddresses[childIndex] = childAddress;
 			
 			//Store current array position
 			int currentPos = in.getCurrentPosition();
 			
 			//Go to address and load in segment.
-			in.toPosition((int)childrenAddress + 1);
+			in.toPosition((int)childIndex + 1);
 			byte[] childData = in.readArray();
 			
-			int type = in.read((int)childrenAddress);
+			int type = in.read((int)childIndex);
 			
 			LFSType lfsType = null;
 			
@@ -445,7 +455,7 @@ public abstract class LFSType
 				throw new UnsupportedOperationException();
 			}
 			
-			this.children[childrenAddressesIndex] = lfsType;
+			this.children[childIndex] = lfsType;
 			
 			lfsType.parent = this;
 			
@@ -591,6 +601,21 @@ public abstract class LFSType
 	public long getSavedMemoryAddress()
 	{
 		return this.savedMemoryAddress;
+	}
+	
+	public LFSType getRootParent()
+	{
+		if(this.parent == null)
+			return this;
+		
+		LFSType parent = this.parent;
+		
+		while(parent.parent != null)
+		{
+			parent = parent.parent;
+		}
+		
+		return parent;
 	}
 	
 	public String getFullPath()
