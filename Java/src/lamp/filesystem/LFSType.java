@@ -268,12 +268,10 @@ public abstract class LFSType
 			//Write segment to empty address
 			out.writeArray(segment.getData(), false);
 		
-			
 			long endOfSegmentAddress = (long)out.getCurrentPosition();
 			
 			if(endOfSegmentAddress > closestSegment)
 				closestSegment = endOfSegmentAddress;
-			
 			
 			//Go back to address map
 			out.toPosition(position);

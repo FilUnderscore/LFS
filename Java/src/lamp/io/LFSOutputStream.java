@@ -7,7 +7,7 @@ import lamp.util.ByteUtil;
 
 public class LFSOutputStream
 {
-	protected List<Byte> buffer;
+	protected ArrayList<Byte> buffer;
 	
 	protected int position;
 	protected int length;
@@ -40,26 +40,7 @@ public class LFSOutputStream
 		
 		if(!overwrite)
 		{
-			boolean verified = false;
-			
-			int verifyPos = this.position;
-			int newPos = this.position;
-			int c = 0;
-			
-			while(c < length)
-			{
-				if(this.buffer.get(verifyPos++) == 0)
-				{
-					c++;
-				}
-				else
-				{
-					newPos++;
-					c = 0;
-				}
-			}
-			
-			this.position = newPos;
+			this.ifCurrentPositionAvailableThenSet(length);
 		}
 		
 		for(int index = 0; index < length; index++)
@@ -94,12 +75,18 @@ public class LFSOutputStream
 	
 	public void ifCurrentPositionAvailableThenSet(int size)
 	{
-		int pos = this.position - 1;
+		int pos = this.position;
 		
 		int empty = 0;
 		
 		while(empty < size)
 		{
+			//Make sure the buffer has enough space, otherwise it triggers an IndexOutOfBoundsException
+			if(pos >= buffer.size())
+			{
+				grow(pos + 1);
+			}
+			
 			//Go to next position, if this position is not empty.
 			if(buffer.get(pos) != 0)
 			{

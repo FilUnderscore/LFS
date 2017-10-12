@@ -39,7 +39,7 @@ public class Main
 		
 		lfsDrive.addChild(lfsDir);
 		
-		lfsDir.addChild(new LFSFile("test", 2, new byte[] { (byte)0xEB, (byte)0x00 }));
+		lfsDir.addChild(new LFSFile("test", 2, new byte[] { (byte)0xEB, (byte)0x00, (byte)0xAA, (byte)0xBB, (byte)0xCC, (byte)0xDD, (byte)0xEE, (byte)0xFF }));
 		lfsDir.addChild(new LFSFile("file", 4, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 }));
 		
 		lfs.addDrive(lfsDrive);
