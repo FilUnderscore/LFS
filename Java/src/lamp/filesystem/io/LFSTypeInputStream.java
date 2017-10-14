@@ -6,6 +6,8 @@ import java.nio.charset.StandardCharsets;
 
 import lamp.io.LFSInputStream;
 
+import static lamp.util.ByteUtil.*;
+
 /**
  * 
  * @author Filip Jerkovic

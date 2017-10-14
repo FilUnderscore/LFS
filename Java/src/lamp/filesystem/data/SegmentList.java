@@ -11,8 +11,6 @@ import java.util.ArrayList;
 @SuppressWarnings("serial")
 public class SegmentList<T extends SegmentedData> extends ArrayList<T> 
 {
-	//TODO: Create a custom List/ArrayList class that doesn't rely on Java libraries.
-	
 	/*
 	 * FIELDS
 	 */

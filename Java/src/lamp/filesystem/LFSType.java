@@ -104,6 +104,9 @@ public abstract class LFSType
 	 */
 	protected byte[] segmentedData;
 	
+	/**
+	 * Checksum of the type (drive, directory, file, etc.).
+	 */
 	protected LFSChecksum checksum;
 	
 	/*
@@ -116,9 +119,9 @@ public abstract class LFSType
 	LFSType() {}
 	
 	/**
+	 * Default constructor with name of type (drive, directory, file, etc.)
 	 * 
-	 * 
-	 * @param name
+	 * @param name Name of Type
 	 */
 	public LFSType(String name)
 	{
@@ -128,10 +131,10 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Constructor with parent's address and name of type.
 	 * 
-	 * 
-	 * @param parentAddress
-	 * @param name
+	 * @param parentAddress Parent's address
+	 * @param name Name of Type
 	 */
 	protected LFSType(long parentAddress, String name)
 	{
@@ -141,9 +144,10 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Constructor with Name of Type and children's addresses.
 	 * 
-	 * @param name
-	 * @param childrenAddresses
+	 * @param name Name of Type
+	 * @param childrenAddresses Children's addresses
 	 */
 	protected LFSType(String name, long...childrenAddresses)
 	{
@@ -153,10 +157,11 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Constructor with parent's address, Name of Type, children's addresses.
 	 * 
-	 * @param parentAddress
-	 * @param name
-	 * @param childrenAddresses
+	 * @param parentAddress Parent's address
+	 * @param name Name of Type
+	 * @param childrenAddresses Children's address
 	 */
 	protected LFSType(long parentAddress, String name, long...childrenAddresses)
 	{
@@ -172,8 +177,9 @@ public abstract class LFSType
 	 */
 	
 	/**
+	 * Set the size of data per segment (memory address area).
 	 * 
-	 * @param size
+	 * @param size Size of data per segment
 	 */
 	public void setSegmentSize(int size)
 	{
@@ -181,7 +187,7 @@ public abstract class LFSType
 	}
 	
 	/**
-	 * 
+	 * Combines the segments into a long byte array. 
 	 */
 	public void combineSegments()
 	{
@@ -214,8 +220,11 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Separates a long byte array into segments of data.
 	 * 
-	 * @return
+	 * @param data Byte array to separate
+	 * 
+	 * @return Separated list of segments.
 	 */
 	public SegmentList<LFSSegment> separateSegments(byte[] data)
 	{
@@ -232,8 +241,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Write the segments of data into the {@link LFSTypeOutputStream} (Output Stream).
 	 * 
-	 * @param out
+	 * @param out {@link LFSTypeOutputStream} OutputStream to output data into.
 	 */
 	public void writeSegments(LFSTypeOutputStream out)
 	{
@@ -283,8 +293,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Read segments from the specified InputStream ({@link LFSTypeInputStream}).
 	 * 
-	 * @param in
+	 * @param in InputStream ({@link LFSTypeInputStream})
 	 */
 	public void readSegments(LFSTypeInputStream in)
 	{
@@ -326,6 +337,12 @@ public abstract class LFSType
 		this.segmentedData = ByteUtil.merge(segments, totalArraySize);
 	}
 	
+	/**
+	 * Creates a segment for the specified memory address, with the provided byte array (data).
+	 * 
+	 * @param segmentAddress New Segment Address
+	 * @param data New Byte Array (data)
+	 */
 	private void createSegment(long segmentAddress, byte[] data)
 	{
 		LFSSegment segment = new LFSSegment(data);
@@ -336,8 +353,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Write parent to the provided OutputStream ({@link LFSTypeOutputStream}).
 	 * 
-	 * @param out
+	 * @param out OutputStream ({@link LFSTypeOutputStream})
 	 */
 	public void writeParent(LFSTypeOutputStream out)
 	{
@@ -357,6 +375,11 @@ public abstract class LFSType
 		out.writeLong(this.parentAddress);
 	}
 	
+	/**
+	 * Read parent from the provided InputStream ({@link LFSTypeInputStream}).
+	 * 
+	 * @param in InputStream ({@link LFSTypeInputStream})
+	 */
 	public void readParent(LFSTypeInputStream in)
 	{
 		if(!in.readBoolean())
@@ -366,8 +389,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Write children to the provided OutputStream ({@link LFSTypeOutputStream}).
 	 * 
-	 * @param out
+	 * @param out OutputStream ({@link LFSTypeOutputStream})
 	 */
 	public void writeChildren(LFSTypeOutputStream out)
 	{
@@ -409,8 +433,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Load children from the provided InputStream ({@link LFSTypeInputStream}).
 	 * 
-	 * @param in
+	 * @param in InputStream ({@link LFSTypeInputStream})
 	 */
 	public void loadChildren(LFSTypeInputStream in)
 	{
@@ -465,8 +490,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Add specific child(ren) to this type.
 	 * 
-	 * @param child
+	 * @param child Child(ren) types to add.
 	 */
 	public void addChild(LFSType... child)
 	{
@@ -487,9 +513,51 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Remove specific child(ren) from this type.
 	 * 
-	 * @param segment
-	 * @param newData
+	 * @param child Child(ren) types to remove.
+	 */
+	public void removeChild(LFSType... child)
+	{
+		if(this.children == null || this.children.length < 0)
+			this.children = new LFSType[0];
+		
+		if(child.length > this.children.length)
+			return;
+		
+		LFSType[] children = new LFSType[this.children.length - child.length];
+		int childIndex = 0;
+		
+		int chIndex = 0;
+		
+		for(int index = 0; index < this.children.length; index++)
+		{
+			if(child.length > chIndex)
+			{
+				break;
+			}
+			
+			if(child[chIndex++] == null)
+			{
+				break;
+			}
+			
+			LFSType c = this.children[index];
+			
+			if(!c.equals(child[chIndex]))
+			{
+				children[childIndex] = c;
+			}
+		}
+		
+		this.children = children;
+	}
+	
+	/**
+	 * Overwrite a segment of data, with new data.
+	 * 
+	 * @param segment Segment ({@link LFSSegment})
+	 * @param newData Updated byte array (data)
 	 */
 	public void overwrite(LFSSegment segment, byte[] newData)
 	{
@@ -497,9 +565,10 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Overwrite a segment of data, at a specific address, with new data.
 	 * 
-	 * @param segmentAddr
-	 * @param newData
+	 * @param segmentAddr Segment address
+	 * @param newData Updated byte array (data)
 	 */
 	public void overwrite(long segmentAddr, byte[] newData)
 	{
@@ -525,19 +594,25 @@ public abstract class LFSType
 	}
 	
 	/**
-	 * 
+	 * Delete all the data associated with the type, by overwriting all the segments with null bytes.
 	 */
 	public void delete()
 	{
+		if(this.segments == null)
+		{
+			return;
+		}
+		
 		for(LFSSegment segment : this.segments)
 		{
-			this.overwrite(segment, new byte[0]);
+			this.overwrite(segment, new byte[this.segments.size() * this.segmentSize]);
 		}
 	}
 	
 	/**
+	 * Update the segments of data of the type.
 	 * 
-	 * @param data
+	 * @param data Updated byte array (data)
 	 */
 	public void update(byte[] data)
 	{
@@ -579,8 +654,9 @@ public abstract class LFSType
 	 */
 	
 	/**
+	 * Get the name of the type.
 	 * 
-	 * @return
+	 * @return Type name
 	 */
 	public String getName()
 	{
@@ -588,8 +664,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the metadata of this type.
 	 * 
-	 * @return
+	 * @return Type metadata
 	 */
 	public LFSTypeMetadata getMetadata()
 	{
@@ -597,8 +674,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the parent type of this type.
 	 * 
-	 * @return
+	 * @return Parent type
 	 */
 	public LFSType getParent()
 	{
@@ -606,8 +684,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the children type(s) of this type.
 	 * 
-	 * @return
+	 * @return Children type(s)
 	 */
 	public LFSType[] getChildren()
 	{
@@ -625,8 +704,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the root parent (first parent) type in the hierarchy.
 	 * 
-	 * @return
+	 * @return Root parent ({@link LFSType}).
 	 */
 	public LFSType getRootParent()
 	{
@@ -644,8 +724,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the parent path(s) of the type (drive, directory, file, etc.) with the name of the type.
 	 * 
-	 * @return
+	 * @return Parent path(s) with the name of the type.
 	 */
 	public String getFullPath()
 	{
@@ -658,8 +739,9 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get the parent path(s) of the type (drive, directory, file, etc.) without the name of the type.
 	 * 
-	 * @return
+	 * @return Parent path(s)
 	 */
 	public String getPath()
 	{
@@ -679,9 +761,11 @@ public abstract class LFSType
 	}
 	
 	/**
+	 * Get a segment of this type at the specified segment address.
 	 * 
-	 * @param segmentAddr
-	 * @return
+	 * @param segmentAddr Segment Address
+	 * 
+	 * @return Segment of Data ({@link LFSSegment}).
 	 */
 	public LFSSegment getSegment(long segmentAddr)
 	{

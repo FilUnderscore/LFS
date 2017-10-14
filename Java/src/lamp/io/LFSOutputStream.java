@@ -1,7 +1,6 @@
 package lamp.io;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import lamp.util.ByteUtil;
 
@@ -11,6 +10,7 @@ import lamp.util.ByteUtil;
  */
 public class LFSOutputStream
 {
+	//TODO: Replace List/ArrayList with custom class so it doesn't rely on Java libraries.
 	/**
 	 * 
 	 */

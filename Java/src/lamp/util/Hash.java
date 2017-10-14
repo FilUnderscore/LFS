@@ -8,8 +8,6 @@ import java.security.MessageDigest;
  */
 public final class Hash 
 {
-	//TODO: Implement Hashing Functions without use of Java libraries.
-	
 	/**
 	 * 
 	 * @param arr
