@@ -128,4 +128,13 @@ public class LFSDirectory extends LFSType
 	{
 		return createDirectory(new LFSDirectory(directoryName));
 	}
+	
+	/*
+	 * OVERRIDEN METHODS
+	 */
+	
+	public int getTypeId()
+	{
+		return LFSType.DIRECTORY;
+	}
 }

@@ -64,4 +64,13 @@ public class LFSFile extends LFSType
 	{
 		return this.segmentedData;
 	}
+	
+	/*
+	 * OVERRIDEN METHODS
+	 */
+	
+	public int getTypeId()
+	{
+		return LFSType.FILE;
+	}
 }

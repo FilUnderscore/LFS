@@ -31,7 +31,7 @@ public class LFSTypeMetadata
 	 */
 	private long timestampLastModified;
 	
-	/**
+	/*
 	 * CONSTRUCTORS
 	 */
 	

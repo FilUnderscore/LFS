@@ -46,6 +46,15 @@ public class LFSOutputStream
 	
 	/**
 	 * 
+	 * @param b
+	 */
+	public void write(byte... b)
+	{
+		this.write(b, 0, b.length);
+	}
+	
+	/**
+	 * 
 	 * @param data
 	 * @param offset
 	 * @param length

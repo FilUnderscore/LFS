@@ -185,4 +185,13 @@ public class LFSDrive extends LFSType
 	{
 		return this.driveId;
 	}
+	
+	/*
+	 * OVERRIDEN METHODS
+	 */
+	
+	public int getTypeId()
+	{
+		return LFSType.DRIVE;
+	}
 }

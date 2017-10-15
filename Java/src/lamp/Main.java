@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 import lamp.filesystem.LFS;
+import lamp.filesystem.LFSType;
 import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
@@ -47,7 +48,7 @@ public class Main
 		lfsDrive.addChild(lfsDir);
 		
 		lfsDir.addChild(new LFSFile("test", 2, new byte[] { (byte)0xEB, (byte)0x00, (byte)0xAA, (byte)0xBB, (byte)0xCC, (byte)0xDD, (byte)0xEE, (byte)0xFF }));
-		lfsDir.addChild(new LFSFile("file", 4, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 }));
+		lfsDir.addChild(new LFSFile("file", 2, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 }));
 		
 		LFS.addDrive(lfsDrive);
 		
@@ -82,8 +83,23 @@ public class Main
 		System.out.println("Metadata: " + drive.getMetadata().toString());
 		System.out.println("");
 		
+		//Print Children
+		for(LFSType child : drive.getChildren())
+		{
+			System.out.println("(Child) Name: " + child.getName());
+			
+			for(LFSType child2 : child.getChildren())
+			{
+				System.out.println("(Child2) Name: " + child2.getName());
+				
+				LFSFile f = (LFSFile) child2;
+				
+				System.out.println("Dat: " + Dump.printHex(f.getData()));
+			}
+		}
+		
 		test12 = LFS.unloadDrive(drive);
 		
-		System.out.println("Data: " + Dump.printHex(test12));
+		System.out.println("Data2: " + Dump.printHex(test12));
 	}
 }

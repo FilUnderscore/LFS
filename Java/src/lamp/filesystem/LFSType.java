@@ -13,6 +13,7 @@ import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 import lamp.util.ByteUtil;
+import lamp.util.Dump;
 
 /**
  * Lamp File System Type.
@@ -98,6 +99,11 @@ public abstract class LFSType
 	 * Segments, each contains a portion of data.
 	 */
 	protected SegmentList<LFSSegment> segments;
+	
+	/**
+	 * 
+	 */
+	protected long[] segmentAddresses;
 	
 	/**
 	 * An array with all the segments recombined from the Segment Addresses.
@@ -249,15 +255,19 @@ public abstract class LFSType
 	{
 		this.segments = this.separateSegments(this.segmentedData);
 		
-		int addrPosition = out.getCurrentPosition() + ByteUtil.INT_SIZE;
+		long closestSegment = 0x00;
+		
+		//Write segment size
+		out.writeInt(this.segmentSize);
+		
+		//Write segments length/size
+		out.writeInt(segments.size());
+		
+		int addrPosition = out.getCurrentPosition();
 		int position = addrPosition;
 		int addressSpace = ByteUtil.LONG_SIZE * segments.size();
 		int afterAddrPos = addrPosition + addressSpace;
 		
-		long closestSegment = 0x00;
-		
-		//Write segments length/size
-		out.writeInt(segments.size());
 		for(LFSSegment segment : segments)
 		{
 			//Skip to empty space - away from segment address table, to be away from conflicts with segment memory addresses
@@ -304,8 +314,42 @@ public abstract class LFSType
 		List<byte[]> segments = new ArrayList<>();
 		int totalArraySize = 0;
 		
+		//Read segment size
+		this.segmentSize = in.readInt();
+		
 		int segmentsSize = in.readInt();
 		
+		this.segmentAddresses = new long[segmentsSize];
+		
+		int addrPosition = in.getCurrentPosition();
+		int addressSpace = ByteUtil.LONG_SIZE * segments.size();
+		int afterAddrPos = addrPosition + addressSpace;
+		
+		for(int segmentAddrIndex = 0; segmentAddrIndex < segmentsSize; segmentAddrIndex++)
+		{
+			this.segmentAddresses[segmentAddrIndex] = in.readLong();
+		}
+		
+		for(int segmentIndex = 0; segmentIndex < segmentsSize; segmentIndex++)
+		{
+			long segmentAddress = this.segmentAddresses[segmentIndex];
+			
+			in.toPosition((int)segmentAddress);
+			
+			byte[] segmentData = in.readArray();
+			
+			totalArraySize += segmentData.length;
+			
+			segments.add(segmentIndex, segmentData);
+			
+			createSegment(segmentAddress, segmentData);
+		}
+		
+		in.toPosition(afterAddrPos);
+		
+		this.segmentedData = ByteUtil.merge(segments, totalArraySize);
+		
+		/*
 		//Current Address of InputStream
 		int currentAddress = in.getCurrentPosition();
 		
@@ -335,6 +379,7 @@ public abstract class LFSType
 		}
 		
 		this.segmentedData = ByteUtil.merge(segments, totalArraySize);
+		*/
 	}
 	
 	/**
@@ -416,6 +461,8 @@ public abstract class LFSType
 		
 		for(int childIndex = 0; childIndex < this.children.length; childIndex++)
 		{
+			out.write((byte)this.children[childIndex].getTypeId());
+			
 			this.children[childIndex].save(out);
 			
 			System.out.println("Child Address: " + this.children[childIndex].savedMemoryAddress);
@@ -447,6 +494,48 @@ public abstract class LFSType
 		this.children = new LFSType[childrenLength];
 		this.childrenAddresses = new long[childrenLength];
 		
+		for(int childAddrIndex = 0; childAddrIndex < childrenLength; childAddrIndex++)
+		{
+			this.childrenAddresses[childAddrIndex] = in.readLong();
+		}
+		
+		for(int childIndex = 0; childIndex < childrenLength; childIndex++)
+		{
+			long childAddress = this.childrenAddresses[childIndex];
+		
+			System.out.println("Address: " + childAddress);
+			
+			in.toPosition((int)childAddress);
+			
+			int type = in.read((int)childAddress - 1);
+			
+			System.out.println("Type: " + type);
+			
+			Class<?> childLfsTypeClass = null;
+			
+			switch(type)
+			{
+			case DRIVE:
+				childLfsTypeClass = LFSDrive.class;
+				break;
+			case DIRECTORY:
+				childLfsTypeClass = LFSDirectory.class;
+				break;
+			case FILE:
+				childLfsTypeClass = LFSFile.class;
+				break;
+			default:
+				throw new UnsupportedOperationException();
+			}
+
+			LFSType childLfsType = LFSType.load(childLfsTypeClass, in);
+		
+			this.children[childIndex] = childLfsType;
+			
+			childLfsType.parent = this;
+		}
+		
+		/*
 		for(int childIndex = 0; childIndex < childrenLength; childIndex++)
 		{
 			long childAddress = in.readLong();
@@ -458,10 +547,14 @@ public abstract class LFSType
 			int currentPos = in.getCurrentPosition();
 			
 			//Go to address and load in segment.
-			in.toPosition((int)childIndex + 1);
+			in.toPosition((int)childAddress);
 			byte[] childData = in.readArray();
 			
-			int type = in.read((int)childIndex);
+			System.out.println("Data: " + Dump.printHex(childData));
+			
+			int type = (int)in.read((int)childAddress);
+			
+			System.out.println("Type: " + type);
 			
 			LFSType lfsType = null;
 			
@@ -487,6 +580,7 @@ public abstract class LFSType
 			//Return to position.
 			in.toPosition(currentPos);
 		}
+		*/
 	}
 	
 	/**
@@ -795,7 +889,7 @@ public abstract class LFSType
 	 * 
 	 * @return {@link LFSType} instance represented by the input data.
 	 */
-	public static <T> LFSType load(Class<?> type, byte[] data)
+	public static <T> LFSType load(Class<?> type, LFSTypeInputStream in)
 	{
 		if(LFSType.class.isAssignableFrom(type))
 		{
@@ -806,7 +900,7 @@ public abstract class LFSType
 				
 				LFSType instance = (LFSType) instanceConstructor.newInstance(new Object[] { "" });
 				
-				instance.load(new LFSTypeInputStream(data));
+				instance.load(in);
 				
 				return instance;
 			}
@@ -861,4 +955,10 @@ public abstract class LFSType
 		
 		this.writeChildren(out);
 	}
+	
+	/*
+	 * ABSTRACT METHODS
+	 */
+	
+	public abstract int getTypeId();
 }

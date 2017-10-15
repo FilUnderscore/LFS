@@ -4,23 +4,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
 
 /**
+ * The main Lamp File System (LFS) instance (static).
  * 
  * @author Filip Jerkovic
  */
 public final class LFS 
 {
+	/*
+	 * VARIABLES
+	 */
+	
 	/**
-	 * 
+	 * List of {@link LFSDrive}(s)
 	 */
 	private static List<LFSDrive> drives;
 	
 	/**
-	 * 
+	 * Initialize the {@link LFSDrive} list.
 	 */
 	public static void initialize()
 	{
@@ -37,7 +43,7 @@ public final class LFS
 		if(driveData == null)
 			return null;
 		
-		LFSDrive drive = (LFSDrive) LFSType.load(LFSDrive.class, driveData);
+		LFSDrive drive = (LFSDrive) LFSType.load(LFSDrive.class, new LFSTypeInputStream(driveData));
 		
 		addDrive(drive);
 		
