@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import lamp.filesystem.exception.FileAlreadyExistsException;
+import lamp.filesystem.exception.FileNotFoundException;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDrive;
@@ -165,7 +167,7 @@ public final class LFS
 	 * @param filePath
 	 * @return
 	 */
-	public static LFSFile getFile(String filePath)
+	public static LFSFile getFile(String filePath) throws FileNotFoundException
 	{
 		for(LFSDrive drive : drives)
 		{
@@ -178,7 +180,7 @@ public final class LFS
 			}
 		}
 		
-		return null;
+		throw new FileNotFoundException(filePath);
 	}
 	
 	/*
@@ -190,11 +192,19 @@ public final class LFS
 	 * @param filePath
 	 * @return
 	 */
-	public static LFSFile createFile(String filePath)
+	public static LFSFile createFile(String filePath) throws FileAlreadyExistsException
 	{
+		try
+		{
+			if(getFile(filePath) != null)
+				throw new FileAlreadyExistsException(filePath);
+		}
+		catch(FileNotFoundException e)
+		{
+			//Handle...
+		}
+		
 		//Parse drive/directory tree..
-		
-		
 		String fileName = "";
 		
 		return new LFSFile(fileName);

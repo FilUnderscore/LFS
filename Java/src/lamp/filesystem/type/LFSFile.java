@@ -1,7 +1,6 @@
 package lamp.filesystem.type;
 
 import lamp.filesystem.LFSType;
-import lamp.filesystem.LFSTypeMetadata;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 
@@ -18,6 +17,8 @@ public class LFSFile extends LFSType
 	public LFSFile(String name)
 	{
 		super(name);
+		
+		this.setTypeId(LFSType.FILE);
 	}
 	
 	/**
@@ -63,14 +64,5 @@ public class LFSFile extends LFSType
 	public byte[] getData()
 	{
 		return this.segmentedData;
-	}
-	
-	/*
-	 * OVERRIDEN METHODS
-	 */
-	
-	public int getTypeId()
-	{
-		return LFSType.FILE;
 	}
 }

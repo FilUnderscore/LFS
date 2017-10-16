@@ -30,23 +30,28 @@ public abstract class LFSType
 	 */
 	
 	/**
-	 * Type Identifier.
+	 * Drive Type Identifier.
 	 */
 	public static final int DRIVE = 0;
 	
 	/**
-	 * Directory Identifier.
+	 * Directory Type Identifier.
 	 */
 	public static final int DIRECTORY = 1;
 	
 	/**
-	 * File Identifier.
+	 * File Type Identifier.
 	 */
 	public static final int FILE = 2;
 	
 	/*
 	 * FIELDS
 	 */
+	
+	/**
+	 * Identifier of this type.
+	 */
+	private int typeId;
 		
 	/**
 	 * Name of this type.
@@ -471,7 +476,7 @@ public abstract class LFSType
 		
 		for(int childIndex = 0; childIndex < this.children.length; childIndex++)
 		{
-			out.write((byte)this.children[childIndex].getTypeId());
+			out.write((byte)this.children[childIndex].typeId);
 			
 			this.children[childIndex].save(out);
 			
@@ -753,6 +758,11 @@ public abstract class LFSType
 		}
 	}
 	
+	protected void setTypeId(int typeId)
+	{
+		this.typeId = typeId;
+	}
+	
 	/*
 	 * RETURN METHODS
 	 */
@@ -965,10 +975,4 @@ public abstract class LFSType
 		
 		this.writeChildren(out);
 	}
-	
-	/*
-	 * ABSTRACT METHODS
-	 */
-	
-	public abstract int getTypeId();
 }
