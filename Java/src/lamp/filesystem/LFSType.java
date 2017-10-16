@@ -254,6 +254,7 @@ public abstract class LFSType
 	public void writeSegments(LFSTypeOutputStream out)
 	{
 		this.segments = this.separateSegments(this.segmentedData);
+		this.segmentAddresses = new long[this.segments.size()];
 		
 		long closestSegment = 0x00;
 		
@@ -264,19 +265,25 @@ public abstract class LFSType
 		out.writeInt(segments.size());
 		
 		int addrPosition = out.getCurrentPosition();
-		int position = addrPosition;
+		//int position = addrPosition;
 		int addressSpace = ByteUtil.LONG_SIZE * segments.size();
 		int afterAddrPos = addrPosition + addressSpace;
 		
-		for(LFSSegment segment : segments)
+		out.toPosition(afterAddrPos);
+		
+		for(int segmentIndex = 0; segmentIndex < segments.size(); segmentIndex++)
 		{
+			LFSSegment segment = segments.get(segmentIndex);
+			
 			//Skip to empty space - away from segment address table, to be away from conflicts with segment memory addresses
 			
-			out.toPosition(afterAddrPos);
+			//out.toPosition(position);
 			
 			//Find empty address with enough space.
 			out.ifCurrentPositionAvailableThenSet(segment.getSize());
 			long emptySegmentAddress = (long)out.getCurrentPosition();
+			
+			this.segmentAddresses[segmentIndex] = emptySegmentAddress;
 			
 			//Write segment to empty address
 			out.writeArray(segment.getData(), false);
@@ -286,17 +293,20 @@ public abstract class LFSType
 			if(endOfSegmentAddress > closestSegment)
 				closestSegment = endOfSegmentAddress;
 			
-			//Go back to address map
-			out.toPosition(position);
-			
-			//Write segment address.
-			out.writeLong(emptySegmentAddress);
-			
 			//Update position
-			position = out.getCurrentPosition();
+			//position = out.getCurrentPosition();
 		}
 		
-		//WriteChildren() overrides segment data. Detect segment data and prevent override.
+		//TODO: WriteChildren() overrides segment data. Detect segment data and prevent override.
+		
+		//Write Addresses.
+		out.toPosition(addrPosition);
+
+		for(int segmentAddressIndex = 0; segmentAddressIndex < this.segmentAddresses.length; segmentAddressIndex++)
+		{
+			out.writeLong(this.segmentAddresses[segmentAddressIndex]);
+		}
+		//End Write Addresses.
 		
 		//Temporary fix?
 		out.toPosition((int)closestSegment);
