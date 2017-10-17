@@ -22,6 +22,8 @@ public final class LFS
 	 * VARIABLES
 	 */
 	
+	public static final String FILE_SEPARATOR = "/";
+	
 	/**
 	 * List of {@link LFSDrive}(s)
 	 */
@@ -180,7 +182,7 @@ public final class LFS
 			}
 		}
 		
-		throw new FileNotFoundException(filePath);
+		return null;
 	}
 	
 	/*

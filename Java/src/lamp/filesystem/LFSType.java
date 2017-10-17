@@ -12,8 +12,8 @@ import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSDirectory;
 import lamp.filesystem.type.LFSDrive;
 import lamp.filesystem.type.LFSFile;
+import lamp.filesystem.util.LFSUtil;
 import lamp.util.ByteUtil;
-import lamp.util.Dump;
 
 /**
  * Lamp File System Type.
@@ -53,6 +53,11 @@ public abstract class LFSType
 	 */
 	private int typeId;
 		
+	/**
+	 * Path Identifier.
+	 */
+	private String pathIdentifier;
+	
 	/**
 	 * Name of this type.
 	 */
@@ -139,6 +144,8 @@ public abstract class LFSType
 		this.name = name;
 		
 		this.typeMetadata = new LFSTypeMetadata();
+	
+		this.setPathId(name);
 	}
 	
 	/**
@@ -763,6 +770,11 @@ public abstract class LFSType
 		this.typeId = typeId;
 	}
 	
+	protected void setPathId(String pathId)
+	{
+		this.pathIdentifier = pathId;
+	}
+	
 	/*
 	 * RETURN METHODS
 	 */
@@ -862,13 +874,19 @@ public abstract class LFSType
 		String path = "";
 		
 		LFSType parent = this.parent;
+		List<LFSType> parentList = new ArrayList<>();
 		
 		while(parent != null)
 		{
-			//Append parent file name (most likely a directory).
-			path += parent.name + "/";
+			parentList.add(parent);
 			
 			parent = parent.parent;
+		}
+		
+		for(LFSType p : LFSUtil.reverseTypeList(parentList))
+		{
+			//Append parent file name (most likely a directory).
+			path += p.pathIdentifier + LFS.FILE_SEPARATOR;
 		}
 		
 		return path;
@@ -951,6 +969,7 @@ public abstract class LFSType
 		this.readParent(in);
 		
 		this.name = in.readString();
+		this.setPathId(this.name);
 		
 		this.typeMetadata = new LFSTypeMetadata();
 		this.typeMetadata.read(in);

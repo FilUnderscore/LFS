@@ -37,6 +37,8 @@ public class LFSDrive extends LFSType implements LFSFileParent
 		this.setTypeId(LFSType.DRIVE);
 		
 		this.driveId = driveId;
+		
+		this.setPathId(this.driveId);
 	}
 	
 	/*
@@ -55,6 +57,8 @@ public class LFSDrive extends LFSType implements LFSFileParent
 		this.driveId = in.readString();
 		
 		super.load(in);
+		
+		this.setPathId(this.driveId);
 	}
 	
 	/**

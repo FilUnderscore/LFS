@@ -1,6 +1,7 @@
 package lamp.filesystem.integrity;
 
 import lamp.filesystem.LFS;
+import lamp.filesystem.exception.FileNotFoundException;
 import lamp.filesystem.io.LFSTypeInputStream;
 import lamp.filesystem.io.LFSTypeOutputStream;
 import lamp.filesystem.type.LFSFile;
@@ -94,6 +95,7 @@ public class LFSChecksum
 	 * 
 	 * @param fileName (Includes path directory)
 	 * @return
+	 * @throws FileNotFoundException 
 	 */
 	public static LFSChecksum load(String filePath)
 	{
@@ -101,12 +103,39 @@ public class LFSChecksum
 		
 		String checksumFilePath = filePath + ".chksum";
 		
-		byte[] fileBytes = LFS.getFile(filePath).getData();
+		byte[] fileBytes = null;
 		
-		LFSFile checksumFile = LFS.getFile(checksumFilePath);
+		try 
+		{
+			fileBytes = LFS.getFile(filePath).getData();
+		} 
+		catch (FileNotFoundException e) 
+		{
+			//File doesn't exist!
+			e.printStackTrace();
+		}
 		
-		//Checksum has not been made for file, either because it's new or modified.
-		if(checksumFile == null)
+		LFSFile checksumFile = null;
+		
+		try
+		{
+			checksumFile = LFS.getFile(checksumFilePath);
+		}
+		catch(FileNotFoundException e)
+		{
+			//Checksum has not been made for file, either because it's new or modified.
+			
+			checksum = save(filePath, fileBytes);
+			
+			return checksum;
+		}
+		
+		byte[] checksumFileBytes = checksumFile.getData();
+		
+		checksum = loadChecksum(checksumFileBytes);
+		
+		// No checksum or invalid checksum data.
+		if(checksum == null)
 		{
 			checksum = save(filePath, fileBytes);
 			
@@ -114,28 +143,14 @@ public class LFSChecksum
 		}
 		else
 		{
-			byte[] checksumFileBytes = checksumFile.getData();
-			
-			checksum = loadChecksum(checksumFileBytes);
-			
-			// No checksum or invalid checksum data.
-			if(checksum == null)
+			if(!checksum.confirmChecksum(fileBytes))
 			{
-				checksum = save(filePath, fileBytes);
-				
-				return checksum;
+				//Deletes the file and it's checksum file.
+				deleteFile(filePath, checksumFilePath);
 			}
 			else
 			{
-				if(!checksum.confirmChecksum(fileBytes))
-				{
-					//Deletes the file and it's checksum file.
-					deleteFile(filePath, checksumFilePath);
-				}
-				else
-				{
-					return checksum;
-				}
+				return checksum;
 			}
 		}
 		

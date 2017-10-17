@@ -90,6 +90,8 @@ public class Main
 			
 			for(LFSType child2 : child.getChildren())
 			{
+				System.out.println("(Child2) Path: " + child2.getFullPath());
+				
 				System.out.println("(Child2) Name: " + child2.getName());
 				
 				LFSFile f = (LFSFile) child2;
